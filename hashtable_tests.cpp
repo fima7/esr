@@ -310,6 +310,10 @@ int main() {
 
 #ifdef ENABLE_INT_INT_BASIC_TESTS
   */
+
+////////////////////////////////////////////////////////////////////////////////
+// Insertions and Retrievals
+////////////////////////////////////////////////////////////////////////////////
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<int, int>>
       (new esr_test::InsertionRetrievalTest<int, int>(16, "<int, int>")));
@@ -351,11 +355,21 @@ int main() {
       shared_ptr<esr_test::InsertionRetrievalTest<bool, bool>>
       (new esr_test::InsertionRetrievalTest<bool, bool>(1, "<bool, bool>")));
 
+////////////////////////////////////////////////////////////////////////////////
+// Constructors and assignments
+////////////////////////////////////////////////////////////////////////////////
+  correctness_tests.push_back(
+      shared_ptr<esr_test::CtorAssignmentTest<int, int>>
+      (new esr_test::CtorAssignmentTest<int, int>(16, "<int, int>")));
+
+////////////////////////////////////////////////////////////////////////////////
+// Deletions
+////////////////////////////////////////////////////////////////////////////////
+#if 0
   correctness_tests.push_back(
       shared_ptr<esr_test::DeletionTest<int, int>>
       (new esr_test::DeletionTest<int, int>(16, "<int, int>")));
 
-#if 0
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<std::string, int>>
       (new esr_test::DeletionTest<std::string, int>

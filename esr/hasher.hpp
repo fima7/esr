@@ -27,7 +27,7 @@ class hash_function<int> : public hasher<int> {
   uint32_t m_prime;
   uint32_t m_a;
   uint32_t m_b;
-  explicit hash_function(int cardinality, uint32_t prime = 10000019) :
+  explicit hash_function(int cardinality = 1, uint32_t prime = 10000019) :
       hasher<int>(cardinality),
       m_prime(prime) {
     std::srand(std::time(0));
@@ -42,7 +42,7 @@ class hash_function<int> : public hasher<int> {
 template <>
 class hash_function<bool> : public hasher<bool> {
  public:
-  explicit hash_function(size_t cardinality) : hasher<bool>(cardinality) {}
+  explicit hash_function(size_t cardinality = 1) : hasher<bool>(cardinality) {}
   uint64_t code(const bool& key) const {
     return (key ? 1231 : 1237);
   }
@@ -54,7 +54,7 @@ class hash_function<char> : public hasher<char> {
   uint32_t m_prime;
   uint32_t m_a;
   uint32_t m_b;
-  explicit hash_function(int cardinality, uint32_t prime = 389) :
+  explicit hash_function(int cardinality = 1, uint32_t prime = 389) :
       hasher<char>(cardinality),
       m_prime(prime) {
     std::srand(std::time(0));
@@ -72,7 +72,7 @@ class hash_function<std::string> : public hasher<std::string> {
  public:
   uint32_t m_prime;
   uint32_t m_multiplier;
-  explicit hash_function(size_t cardinality,
+  explicit hash_function(size_t cardinality = 1,
                    size_t multiplier = 263,
                    size_t prime = 1000000007) :
       hasher<std::string>(cardinality),
@@ -92,7 +92,7 @@ class hash_function<std::string> : public hasher<std::string> {
  public:
   uint32_t m_prime;
   uint32_t m_multiplier;
-  explicit hash_function(size_t cardinality,
+  explicit hash_function(size_t cardinality = 1,
                    size_t multiplier = 263,
                    size_t prime = 1000000007) :
       hasher<std::string>(cardinality),

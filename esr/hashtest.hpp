@@ -252,11 +252,11 @@ class InsertionRetrievalTest : public CorrectnessTest {
 };
 
 template <typename K, typename V>
-class RuleOfFiveTest : public InsertionRetrievalTest<K, V> {
+class CtorAssignmentTest : public InsertionRetrievalTest<K, V> {
  public:
-  explicit RuleOfFiveTest(int intput_size = 1024,
+  explicit CtorAssignmentTest(int intput_size = 1024,
                         const std::string & description = "",
-                        const std::string & name = "RuleOfFive") :
+                        const std::string & name = "CtorAssignmentTest") :
       InsertionRetrievalTest<K, V>(intput_size, description, name) {}
   virtual bool run() {
     // if (InsertionRetrievalTest<K, V>::m_positive_table.empty()) {
@@ -268,13 +268,15 @@ class RuleOfFiveTest : public InsertionRetrievalTest<K, V> {
 
     // bool add(const K& key, const V& value);
     if (!this->add_positive()) {
-      std::cout << "Unexpected rule of five behavour. " << std::flush;
+      std::cout << "Unexpected constructor or assignment behavour. "
+                << std::flush;
       return false;
     }
 
     if (!copy_constructor() || !copy_assignment() ||
         !move_constructor() || !move_assignment()) {
-      std::cout << "Unexpected rule of five behavour. " << std::flush;
+      std::cout << "Unexpected constructor or assignment behavour. "
+                << std::flush;
        return false;
     }
 
@@ -283,7 +285,7 @@ class RuleOfFiveTest : public InsertionRetrievalTest<K, V> {
 
  private:
   bool copy_constructor() {
-    // esr::Hashtable<K, V> temp = (this->m_test_table);
+    esr::Hashtable<K, V> temp = (this->m_test_table);
     return true;
   }
 

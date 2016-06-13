@@ -23,7 +23,8 @@ template <typename K, typename V>
 class Hashtable {
  public:
   class iterator;
-  // Hashtable(const Hashtable& other) {}
+
+  Hashtable(const Hashtable& other);
 
   // Hashtable() {}
   // Hashtable(Hashtable&& other) {}
@@ -32,7 +33,6 @@ class Hashtable {
   // Hashtable & operator=(Hashtable& rhs) { return rhs; }
 
 
-  
   explicit Hashtable(size_t load_factor_bound_low = 49,
                      size_t load_factor_bound_up = 99);
   virtual ~Hashtable();
@@ -109,6 +109,19 @@ class Hashtable {
 
   bool resize(size_t cardinality);
 };
+
+////////////////////////////////////////////////////////////////////////////////
+// Constructors and assignments
+////////////////////////////////////////////////////////////////////////////////
+template <typename K, typename V>
+Hashtable<K, V>::Hashtable(const Hashtable<K, V>& other) {
+  m_load_factor_bound_low = other.m_load_factor_bound_low;
+  m_load_factor_bound_up = other.m_load_factor_bound_up;
+  m_bucket_count = other.m_bucket_count;
+  m_size = other.m_size;
+  hash = other.hash;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Iterator
