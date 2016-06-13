@@ -252,7 +252,7 @@ class InsertionRetrievalTest : public CorrectnessTest {
 };
 
 template <typename K, typename V>
-class RuleOfFiveTest : public RuleOfFiveTest<K, V> {
+class RuleOfFiveTest : public InsertionRetrievalTest<K, V> {
  public:
   explicit RuleOfFiveTest(int intput_size = 1024,
                         const std::string & description = "",
@@ -272,8 +272,8 @@ class RuleOfFiveTest : public RuleOfFiveTest<K, V> {
       return false;
     }
 
-    if (!rm_positive() || !rm_negative() ||
-        !rm_positive_pedantic() || !rm_negative_pedantic()) {
+    if (!copy_constructor() || !copy_assignment() ||
+        !move_constructor() || !move_assignment()) {
       std::cout << "Unexpected rule of five behavour. " << std::flush;
        return false;
     }
@@ -282,20 +282,20 @@ class RuleOfFiveTest : public RuleOfFiveTest<K, V> {
   }
 
  private:
-  bool rm_copy_constructor() {
-    esr::Hashtable<K, V> temp = this->m_test_table;
+  bool copy_constructor() {
+    // esr::Hashtable<K, V> temp = (this->m_test_table);
     return true;
   }
 
-  bool rm_copy_assignment() {
+  bool copy_assignment() {
     return true;
   }
 
-  bool rm_move_constructor() {
+  bool move_constructor() {
     return true;
   }
 
-  bool rm_move_assignment() {
+  bool move_assignment() {
     return true;
   }
 };
@@ -316,7 +316,7 @@ class DeletionTest : public InsertionRetrievalTest<K, V> {
                 << __ESR_PRETTY_FUNCTION__ << '\n'
                 << std::flush;
     }
-
+    
     // bool add(const K& key, const V& value);
     if (!this->add_positive()) {
       std::cout << "Unexpected insertion behavour. " << std::flush;
@@ -328,13 +328,11 @@ class DeletionTest : public InsertionRetrievalTest<K, V> {
       std::cout << "Unexpected deletion behavour. " << std::flush;
        return false;
     }
-
     return true;
   }
 
  private:
   bool rm_positive() {
-    esr::Hashtable<K, V> temp = this->m_test_table;
     return true;
   }
 

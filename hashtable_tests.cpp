@@ -355,6 +355,7 @@ int main() {
       shared_ptr<esr_test::DeletionTest<int, int>>
       (new esr_test::DeletionTest<int, int>(16, "<int, int>")));
 
+#if 0
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<std::string, int>>
       (new esr_test::DeletionTest<std::string, int>
@@ -392,6 +393,7 @@ int main() {
       shared_ptr<esr_test::DeletionTest<bool, bool>>
       (new esr_test::DeletionTest<bool, bool>(1, "<bool, bool>")));
 
+#endif
 
   for (auto test : correctness_tests) {
     std::cout << test->name()
