@@ -1,0 +1,8 @@
+1. supported types bool, int, string 
+2. tests: variable string length
+3. tests: string key=value
+4. tests: string tests ignores input size value
+5. copy, assign, move Hashtable
+6. Random access tests are not necessary, because all tests
+   access Hashtable randomly, since Hashtable and unordered_map
+   hashfunctions are different. 
