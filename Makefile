@@ -6,7 +6,10 @@ TESTS = -DENABLE_INT_INT_TESTS \
 	-DENABLE_INT_INT_BASIC_TESTS \
 	-DENABLE_INT_INT_RANDOM_ACCESS_TEST # -DENABLE_INT_INT_HAVY_TEST 
 
-all: hashtable cities
+linkedlist_test: linkedlist_test.cpp
+	$(CL) -I$(INCLUDE) -DFIMA_LOCAL linkedlist_test.cpp -o linkedlist_test 
+
+#all: hashtable cities
 
 cities: cities.cpp esr/hashtable.hpp
 	$(CL) -I$(INCLUDE) -DFIMA_LOCAL cities.cpp -o cities 

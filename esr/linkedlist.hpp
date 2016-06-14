@@ -1,4 +1,7 @@
 // Copyright 2016
+#ifndef ESR_LINKEDLIST_FLYMAKE_HPP_
+#define ESR_LINKEDLIST_FLYMAKE_HPP_
+
 #include <iostream>
 #include <ostream>
 #include <utility>
@@ -9,6 +12,8 @@ using std::ostream;
 ////////////////////////////////////////////////////////////////////////////////
 // Linked List Implementetion
 ////////////////////////////////////////////////////////////////////////////////
+namespace esr {
+
 template <typename K, typename V>
 class listnode {
   template <typename KK, typename VV>
@@ -90,6 +95,9 @@ linkedlist<K, V>& linkedlist<K, V>::operator=(linkedlist other) {
   return *this;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Accessors and Modifiers
+////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
 void linkedlist<K, V>::push_back(const K& key, const V& value) {
   if (m_head == nullptr) {
@@ -159,6 +167,9 @@ void linkedlist<K, V>::clear() {
     m_tail = m_head = nullptr;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Printout
+////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
 ostream & operator<<(ostream & os, const linkedlist<K, V>& ll) {
   listnode<K, V> *node = ll.m_head;
@@ -173,3 +184,6 @@ ostream & operator<<(ostream & os, const linkedlist<K, V>& ll) {
   return os;
 }
 
+}  // namespace esr
+
+#endif  // ESR_LINKEDLIST_FLYMAKE_HPP_
