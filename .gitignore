@@ -29,3 +29,6 @@
 *.app
 cities
 hashtable
+
+#Emacs
+*~
