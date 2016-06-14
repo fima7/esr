@@ -6,3 +6,4 @@
 6. Random access tests are not necessary, because all tests
    access Hashtable randomly, since Hashtable and unordered_map
    hashfunctions are different. 
+7. operator prcendance

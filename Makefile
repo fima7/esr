@@ -6,16 +6,23 @@ TESTS = -DENABLE_INT_INT_TESTS \
 	-DENABLE_INT_INT_BASIC_TESTS \
 	-DENABLE_INT_INT_RANDOM_ACCESS_TEST # -DENABLE_INT_INT_HAVY_TEST 
 
-linkedlist_test: linkedlist_test.cpp
+all: tiny_test linkedlist_test 
+
+linkedlist_test: linkedlist_test.cpp esr/linkedlist.hpp
 	$(CL) -I$(INCLUDE) -DFIMA_LOCAL linkedlist_test.cpp -o linkedlist_test 
+
+tiny_test: tiny_test.cpp esr/hashtable.hpp esr/hasher.hpp esr/linkedlist.hpp
+	$(CL) -I$(INCLUDE) $(TESTS) -DFIMA_LOCAL tiny_test.cpp -o tiny_test
+
+
+hashtable_test: hashtable_tests.cpp esr/hashtable.hpp
+	$(CL) -I$(INCLUDE) $(TESTS) -DFIMA_LOCAL hashtable_tests.cpp -o hashtable 
+
 
 #all: hashtable cities
 
 cities: cities.cpp esr/hashtable.hpp
 	$(CL) -I$(INCLUDE) -DFIMA_LOCAL cities.cpp -o cities 
-
-hashtable: hashtable_tests.cpp esr/hashtable.hpp
-	$(CL) -I$(INCLUDE) $(TESTS) -DFIMA_LOCAL hashtable_tests.cpp -o hashtable 
 
 submission: hashtable.cpp
 	$(CL) hashtable.cpp -o hashtable

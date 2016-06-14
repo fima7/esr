@@ -19,7 +19,7 @@ class listnode {
   template <typename KK, typename VV>
   friend class linkedlist;
  public:
-  listnode(void) : m_next(nullptr) {}
+  listnode() : m_next(nullptr) {}
   explicit listnode(const K& key, const V& value) :
       m_key(key), m_value(value), m_next(nullptr) {}
   listnode(const K& key, const V& value, listnode* next) :
@@ -30,6 +30,7 @@ class listnode {
 
   V& value() { return m_value; }
   const V& value() const { return m_value; }
+  void set(const V& value) { m_value = value; }
 
   listnode* next() { return m_next; }
 
@@ -50,13 +51,16 @@ class linkedlist {
   linkedlist(const linkedlist& other);
   ~linkedlist();
 
-  linkedlist & operator=(linkedlist other);
+  linkedlist& operator=(linkedlist other);
 
-  void push_back(const K& key, const V& value);
+  bool push_back(const K& key, const V& value);
   const listnode<K, V>* find(const K& key) const;
   listnode<K, V>* find(const K& key);
+  listnode<K, V>* front();  // const, non const
   bool erase(const K& key);
   size_t size() { return m_size; }
+  bool empty();
+
 
   template <typename KK, typename VV>
   friend ostream & operator<<(ostream & os, const linkedlist<KK, VV>& ll);
@@ -99,14 +103,18 @@ linkedlist<K, V>& linkedlist<K, V>::operator=(linkedlist other) {
 // Accessors and Modifiers
 ////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
-void linkedlist<K, V>::push_back(const K& key, const V& value) {
+bool linkedlist<K, V>::push_back(const K& key, const V& value) {
   if (m_head == nullptr) {
     m_tail = m_head = new listnode<K, V>(key, value);
   } else {
+    for (listnode<K, V>* node; node; node = node->m_next)
+      if (node->m_key == key)
+        return false;  // dublicate keys
     m_tail->m_next = new listnode<K, V>(key, value);
     m_tail = m_tail->m_next;
   }
   m_size++;
+  return true;
 }
 
 template <typename K, typename V>
@@ -156,6 +164,18 @@ listnode<K, V>* linkedlist<K, V>::find(const K& key) {
 }
 
 template <typename K, typename V>
+listnode<K, V>* linkedlist<K, V>::front() {  // const, non const
+  return m_head;
+}
+
+template <typename K, typename V>
+bool linkedlist<K, V>::empty() {
+  if (m_head == nullptr)
+    return true;
+  return false;
+}
+
+template <typename K, typename V>
 void linkedlist<K, V>::clear() {
   listnode<K, V> *node_to_delete = m_head;
     while (node_to_delete != nullptr) {
@@ -172,15 +192,8 @@ void linkedlist<K, V>::clear() {
 ////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
 ostream & operator<<(ostream & os, const linkedlist<K, V>& ll) {
-  listnode<K, V> *node = ll.m_head;
-  if (ll.m_head == nullptr) {
-    os << "empty";;
-    return os;
-  }
-  while (node != nullptr) {
-    os << '(' << *node << ')' << " ";
-    node = node->next();
-  }
+  for (listnode<K, V> *node = ll.m_head; node != nullptr; node = node->next())
+    os << '(' << *node << ')';
   return os;
 }
 
