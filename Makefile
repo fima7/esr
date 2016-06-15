@@ -28,4 +28,4 @@ submission: hashtable.cpp
 	$(CL) hashtable.cpp -o hashtable
 
 clean:
-	rm -f cities hashtable *.o 
+	rm -f cities hashtable_test linkedlist_test tiny_test *.o 
