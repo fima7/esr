@@ -32,6 +32,7 @@ class Hashtable {
   const V* get(const K& key) const;
   iterator find(const K& key);
 
+  size_t size() { return m_size; }
   size_t load_factor() const { return (m_LoadFactorMax*m_size)/m_bucket_count; }
 
   template <typename KK, typename VV>
@@ -85,7 +86,7 @@ class Hashtable {
 
   size_t m_bucket_count;
   linkedlist<K, V>* m_buckets;
-
+  // utilization: empty, avg length of occupied
   bool resize(size_t cardinality);
 
   static const size_t m_LoadFactorMax = 100;  // 100%
@@ -348,7 +349,7 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
 ////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
 bool Hashtable<K, V>::resize(size_t bucket_count) {
-  std::cerr << "resize to: " << bucket_count << '\n';
+  // std::cerr << "resize to: " << bucket_count << '\n';
   // reasign current iterator
   // no, add with iteration
   std::unique_ptr<linkedlist<K, V>[]> ptr(new linkedlist<K, V>[bucket_count]);
