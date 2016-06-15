@@ -1,6 +1,6 @@
 // Copyright 2016
-#ifndef ESR_ESR_HASHTEST_FLYMAKE_HPP_
-#define ESR_ESR_HASHTEST_FLYMAKE_HPP_
+#ifndef ESR_HASHTEST_FLYMAKE_HPP_
+#define ESR_HASHTEST_FLYMAKE_HPP_
 
 #include <string>
 
@@ -63,7 +63,6 @@ class InsertionRetrievalTest : public CorrectnessTest {
     // const V& get(const K& key, bool *success) const;
     // iterator find(const K& key);
     if (!get_by_pointer_positive()   || !get_by_pointer_negative() ||
-        !get_by_reference_positive() || !get_by_reference_negative() ||
         !find_positive() || !find_negative()) {
       std::cout << "Unexpected retrieval behavour. " << std::flush;
        return false;
@@ -155,52 +154,6 @@ class InsertionRetrievalTest : public CorrectnessTest {
     }
     return true;
   }
-  virtual bool get_by_reference_positive() {
-    // const V& get(const K& key, bool *success);
-    for (auto & key_value : m_positive_table) {
-      const K& e_key = key_value.first;
-      const V& e_value = key_value.second;
-      bool success;
-      const V& r_value  = m_test_table.get(e_key, &success);
-      if (!success) {
-        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
-                  << "no value for for key = " << e_key << ", "
-                  << "expected value = " << e_value << ". "
-                  << std::flush;
-        return false;
-      }
-      if (r_value != e_value) {
-        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
-                  << "value = " << r_value
-                  << " and value = " << e_value
-                  << " are different for key = " << e_key << ". "
-                  << std::flush;
-        return false;
-      }
-    }
-    return true;
-  }
-
-  virtual bool get_by_reference_negative() {
-    // const V& get(const K& key, bool *success);
-    /*
-    for (auto & key_value : m_negative_table) {
-      const K& e_key = key_value.first;
-      const V& e_value = key_value.second;
-      bool success;
-      const V& r_value  = m_test_table.get(e_key, &success);
-      if (success) {
-        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
-                  << "unexpected (key = " << e_key << ", "
-                  << "value = " << r_value << "). "
-                  << std::flush;
-        return false;
-      }
-    */
-    // needs exception
-    return true;
-  }
-
   virtual bool find_positive() {
     // iterator find(const K& key);
     for (auto & key_value : m_positive_table) {
@@ -215,8 +168,8 @@ class InsertionRetrievalTest : public CorrectnessTest {
                   << std::flush;
         return false;
       }
-      K& r_key = (*found).first;
-      V& r_value = (*found).second;
+      const K& r_key = found->key();
+      V& r_value = found->value();
       // if (r_key == e_key)  // uncomment to test the test
       if (r_key != e_key || r_value != e_value) {
         std::cout << __ESR_PRETTY_FUNCTION__ << ' '
@@ -238,8 +191,8 @@ class InsertionRetrievalTest : public CorrectnessTest {
       const V& e_value = key_value.second;
       hashtable_iterator_t found = m_test_table.find(e_key);
       if (found != m_test_table.end()) {
-        K& r_key = (*found).first;
-        V& r_value = (*found).second;
+        const K& r_key = found->key();
+        V& r_value = found->value();
         std::cout << __ESR_PRETTY_FUNCTION__ << ' '
                   << "unexpected (key = " << r_key << ", "
                   << "value = " << r_value << "). "
@@ -252,29 +205,26 @@ class InsertionRetrievalTest : public CorrectnessTest {
 };
 
 template <typename K, typename V>
-class CtorAssignmentTest : public InsertionRetrievalTest<K, V> {
+class CopyAssignmentTest : public InsertionRetrievalTest<K, V> {
  public:
-  explicit CtorAssignmentTest(int intput_size = 1024,
+  explicit CopyAssignmentTest(int intput_size = 1024,
                         const std::string & description = "",
-                        const std::string & name = "CtorAssignmentTest") :
+                        const std::string & name = "CopyAssignmentTest") :
       InsertionRetrievalTest<K, V>(intput_size, description, name) {}
   virtual bool run() {
-    // if (InsertionRetrievalTest<K, V>::m_positive_table.empty()) {
     if (this->m_positive_table.empty()) {
       std::cout << "expected hashtable empty in "
                 << __ESR_PRETTY_FUNCTION__ << '\n'
                 << std::flush;
     }
 
-    // bool add(const K& key, const V& value);
     if (!this->add_positive()) {
       std::cout << "Unexpected constructor or assignment behavour. "
                 << std::flush;
       return false;
     }
 
-    if (!copy_constructor() || !copy_assignment() ||
-        !move_constructor() || !move_assignment()) {
+    if (!copy_constructor() || !copy_assignment()) {
       std::cout << "Unexpected constructor or assignment behavour. "
                 << std::flush;
        return false;
@@ -285,24 +235,112 @@ class CtorAssignmentTest : public InsertionRetrievalTest<K, V> {
 
  private:
   bool copy_constructor() {
-    esr::Hashtable<K, V> temp = (this->m_test_table);
+    esr::Hashtable<K, V> temp(this->m_test_table);
+    // Destination more than source
+    for (auto& t : temp) {
+      auto found = this->m_test_table.find(t.key());
+      if (found == this->m_test_table.end()) {
+         std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                   << "no value in source table for key = "
+                   << t.key() << ". " << std::flush;
+        return false;
+      }
+
+      const K& r_key = found->key();
+      V& r_value = found->value();
+
+      if (r_key != t.key() || r_value != t.value()) {
+        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                  << "(key = " << r_key << ", "
+                  << "value = " << r_value << ") "
+                  << "doesn't match expected "
+                  << "(key = " << t.key() << ", "
+                  << "value = " << t.value() << "). "
+                  << std::flush;
+        return false;
+      }
+    }
+    // Source more than destination
+    for (auto& t : this->m_test_table) {
+      auto found = temp.find(t.key());
+      if (found == temp.end()) {
+        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                  << "no value in destination table for key = "
+                  << t.key() << ". " << std::flush;
+        return false;
+      }
+
+      const K& r_key = found->key();
+      V& r_value = found->value();
+
+      if (r_key != t.key() || r_value != t.value()) {
+        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                  << "(key = " << r_key << ", "
+                  << "value = " << r_value << ") "
+                  << "doesn't match expected "
+                  << "(key = " << t.key() << ", "
+                  << "value = " << t.value() << "). "
+                  << std::flush;
+        return false;
+      }
+    }
     return true;
   }
 
   bool copy_assignment() {
-    return true;
-  }
+    esr::Hashtable<K, V> temp;
+    temp = this->m_test_table;
+    // Destination more than source
+    for (auto& t : temp) {
+      auto found = this->m_test_table.find(t.key());
+      if (found == this->m_test_table.end()) {
+         std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                   << "no value in source table for key = "
+                   << t.key() << ". " << std::flush;
+        return false;
+      }
 
-  bool move_constructor() {
-    return true;
-  }
+      const K& r_key = found->key();
+      V& r_value = found->value();
 
-  bool move_assignment() {
+      if (r_key != t.key() || r_value != t.value()) {
+        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                  << "(key = " << r_key << ", "
+                  << "value = " << r_value << ") "
+                  << "doesn't match expected "
+                  << "(key = " << t.key() << ", "
+                  << "value = " << t.value() << "). "
+                  << std::flush;
+        return false;
+      }
+    }
+    // Source more than destination
+    for (auto& t : this->m_test_table) {
+      auto found = temp.find(t.key());
+      if (found == temp.end()) {
+        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                  << "no value in destination table for key = "
+                  << t.key() << ". " << std::flush;
+        return false;
+      }
+
+      const K& r_key = found->key();
+      V& r_value = found->value();
+
+      if (r_key != t.key() || r_value != t.value()) {
+        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                  << "(key = " << r_key << ", "
+                  << "value = " << r_value << ") "
+                  << "doesn't match expected "
+                  << "(key = " << t.key() << ", "
+                  << "value = " << t.value() << "). "
+                  << std::flush;
+        return false;
+      }
+    }
     return true;
   }
 };
-
-
 
 template <typename K, typename V>
 class DeletionTest : public InsertionRetrievalTest<K, V> {
@@ -318,39 +356,46 @@ class DeletionTest : public InsertionRetrievalTest<K, V> {
                 << __ESR_PRETTY_FUNCTION__ << '\n'
                 << std::flush;
     }
-    
     // bool add(const K& key, const V& value);
     if (!this->add_positive()) {
       std::cout << "Unexpected insertion behavour. " << std::flush;
       return false;
     }
 
-    if (!rm_positive() || !rm_negative() ||
-        !rm_positive_pedantic() || !rm_negative_pedantic()) {
+    if (!rm_positive() || !rm_negative()) {
       std::cout << "Unexpected deletion behavour. " << std::flush;
-       return false;
+      return false;
     }
     return true;
   }
 
  private:
   bool rm_positive() {
+    esr::Hashtable<K, V> temp = this->m_test_table;
+    for (auto& expect : this->m_test_table) {
+      temp.remove(expect.key());
+      auto found = temp.find(expect.key());
+      if (found != temp.end()) {
+        std::cout << __ESR_PRETTY_FUNCTION__ << ' '
+                  << "(key = " << found->key() << ", "
+                  << "value = " << found->value() << ") "
+                  << "found after removal. "
+                  << std::flush;
+        return false;
+      }
+    }
     return true;
   }
 
   bool rm_negative() {
-    return true;
-  }
-
-  bool rm_positive_pedantic() {
-    return true;
-  }
-
-  bool rm_negative_pedantic() {
+    esr::Hashtable<K, V> temp = this->m_test_table;
+    for (auto& expect : this->m_negative_table) {
+      temp.remove(expect.first);
+    }
     return true;
   }
 };
 
 }  // namespace esr_test
 
-#endif  // ESR_ESR_HASHTEST_FLYMAKE_HPP_
+#endif  // ESR_HASHTEST_FLYMAKE_HPP_
