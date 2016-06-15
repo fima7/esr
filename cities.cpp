@@ -90,7 +90,7 @@ class hash_function<city::hkey> :
       m_string_hasher(cardinality),
       m_start(start),
       m_prime(prime) {
-    std::cout << __ESR_PRETTY_FUNCTION__ << '\n';
+    // std::cout << __ESR_PRETTY_FUNCTION__ << '\n';
   }
 
   uint64_t code(const city::hkey& key) const {
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
     return -ret::file_error;
   }
 
-  std::vector<city::city> cities;
+  std::vector<city::city> STL_CITIES;
 
   while (file.good()) {
     std::vector<std::string> line;
@@ -150,22 +150,73 @@ int main(int argc, char *argv[]) {
       city.population = std::stoul(line[3]);
       city.area = std::stoul(line[4]);
       city.state = line[5];
-      cities.push_back(city);
+      STL_CITIES.push_back(city);
     }
   }
   file.close();
 
-  esr::Hashtable<city::hkey, uint32_t> city_hash;
-  for (auto city : cities) {
-    city::hkey key(city);
-    city_hash.add(key, city.population);
-  }
+  esr::Hashtable<city::hkey, uint32_t> city_data_table;
 
-  for (auto city : cities) {
+  std::cout << "DATA: " << std::flush;
+  for (auto& city : STL_CITIES) {
     city::hkey key(city);
-    // city_hash.add(key, city.population);
+    city_data_table.add(key, city.population);
   }
-  std::cout << city_hash << '\n';
+  std::cout << city_data_table.size() << " entries added. \n";
+
+  std::cout << "YEARS: " << std::flush;
+  esr::Hashtable<int, uint16_t> city_year_table;
+  auto end = city_year_table.end();
+  for (auto& city : city_data_table) {
+    auto found = city_year_table.find(city.key().year);
+    if (found != end)
+      ++found->value();
+    else
+      city_year_table.add(city.key().year, 1);
+  }
+  std::cout << "total " << city_year_table.size() << "\n";
+  for (auto& year : city_year_table)
+    std::cout << " " << year.value()  << " cities in "
+              << " " << year.key() << "\n";
+
+  std::cout << "STATUS: " << std::flush;
+  esr::Hashtable<std::string, bool> city_status_table;
+  for (auto& city : city_data_table)
+    city_status_table.add(city.key().name, city.key().is_capital);
+  std::cout << "total " << city_status_table.size() << "\n";
+
+  uint32_t number_of_capitals = 0;
+  uint32_t number_of_secondaries = 0;
+  for (auto& status : city_status_table) {
+    bool is_capital = status.value();
+    if (is_capital)
+      ++number_of_capitals;
+    else
+      ++number_of_secondaries;
+  }
+  std::cout << " " << number_of_capitals << " capitals\n"
+            << " " << number_of_secondaries << " secondaries\n";
+
+ 
+
+
+  
+  /*
+  std::cout << "Iterator test: " << std::flush;
+  for (auto& city : city_data_table) {
+    std::cout << city.key().year << " - "
+              << city.key().name << ": "
+              << city.value() << '\n' << std::flush;
+  }
+  */
+  /*
+  std::cout << "Cities" << std::flush;
+  for (auto& city : STL_CITIES) {
+    city::hkey key(city);
+    city_data_table.add(key, city.population);
+  }
+  */ 
+  
   return ret::success;
 }
 

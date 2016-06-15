@@ -1,8 +1,10 @@
 // Copyright 2016
 #include <iostream>
+#include <string>
 #include <esr/hashtable.hpp>
 
 int main(int argc, char *argv[]) {
+
   esr::Hashtable<int, int> table;
   table.add(5, 8);
   table.add(7, 8);
@@ -86,6 +88,17 @@ int main(int argc, char *argv[]) {
     table_resized.remove(i);
 
   std::cerr << table_resized << '\n';
+
+  std::cerr << "Duplicate keys\n";
+  esr::Hashtable<std::string, int> table_dup_strings;
+  esr::Hashtable<int, int> table_dup_ints;
+  for (int i = 0; i < 16; ++i) {
+    table_dup_strings.add("duplicate", i);
+    table_dup_ints.add(5, i);
+  }
+  std::cerr << table_dup_strings << '\n';
+  std::cerr << table_dup_ints << '\n';
+
   return 0;
 }
 

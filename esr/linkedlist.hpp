@@ -107,9 +107,10 @@ bool linkedlist<K, V>::push_back(const K& key, const V& value) {
   if (m_head == nullptr) {
     m_tail = m_head = new listnode<K, V>(key, value);
   } else {
-    for (listnode<K, V>* node; node; node = node->m_next)
-      if (node->m_key == key)
+    for (listnode<K, V>* node = m_head; node; node = node->m_next)
+      if (node->m_key == key) {
         return false;  // dublicate keys
+      }
     m_tail->m_next = new listnode<K, V>(key, value);
     m_tail = m_tail->m_next;
   }
