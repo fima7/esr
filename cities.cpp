@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
     city::hkey key(city);
     city_data_table.add(key, city.population);
   }
-  std::cout << city_data_table.size() << " entries added. \n";
+  std::cout << city_data_table.size() << " entries\n";
 
   std::cout << "YEARS: " << std::flush;
   esr::Hashtable<int, uint16_t> city_year_table;
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
     else
       city_year_table.add(city.key().year, 1);
   }
-  std::cout << "total " << city_year_table.size() << "\n";
+  std::cout << city_year_table.size() << " entries \n";
   for (auto& year : city_year_table)
     std::cout << " " << year.value()  << " cities in "
               << " " << year.key() << "\n";
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
   esr::Hashtable<std::string, bool> city_status_table;
   for (auto& city : city_data_table)
     city_status_table.add(city.key().name, city.key().is_capital);
-  std::cout << "total " << city_status_table.size() << "\n";
+  std::cout << city_status_table.size() << " entries.\n";
 
   uint32_t number_of_capitals = 0;
   uint32_t number_of_secondaries = 0;
@@ -197,8 +197,37 @@ int main(int argc, char *argv[]) {
   std::cout << " " << number_of_capitals << " capitals\n"
             << " " << number_of_secondaries << " secondaries\n";
 
- 
+  std::cout << "AREA: " << std::flush;
+  esr::Hashtable<std::string, int> city_area_table;
+  for (auto& city : city_data_table)
+    city_area_table.add(city.key().name, city.key().area);
+  std::cout << city_area_table.size() << " entries\n";
 
+
+  uint64_t total_area = 0;
+  for (auto& city : city_area_table)
+      total_area += city.value();
+
+  std::cout << " " << total_area << " sq.km of "
+            << city_area_table.size() << " cities.\n";
+
+  std::cout << "STATE: " << std::flush;
+  esr::Hashtable<std::string, std::string> city_state_table;
+  esr::Hashtable<std::string, int> city_state_counter_table;
+  for (auto& city : city_data_table) {
+    city_state_table.add(city.key().name, city.key().state);
+    auto found = city_state_counter_table.find(city.key().state);
+    if (found != city_state_counter_table.end())
+      ++found->value();
+    else
+      city_state_counter_table.add(city.key().state, 1);
+  }
+
+  std::cout << "total " << city_state_counter_table.size() << "\n";
+  std::cout << city_state_counter_table <<'\n';
+
+
+  
 
   
   /*
