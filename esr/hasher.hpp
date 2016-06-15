@@ -1,8 +1,9 @@
 // Copyright 2016
-#ifndef ESR_ESR_HASHER_FLYMAKE_HPP_
-#define ESR_ESR_HASHER_FLYMAKE_HPP_
+#ifndef ESR_HASHER_FLYMAKE_HPP_
+#define ESR_HASHER_FLYMAKE_HPP_
 
 #include <string>
+#include <cassert>
 
 namespace esr {
 
@@ -12,6 +13,7 @@ class hasher {
   explicit hasher(size_t cardinality) : m_cardinality(cardinality) {}
   virtual uint64_t code(const K& key) const = 0;
   size_t operator()(const K& key) const {
+    assert(m_cardinality > 0);
     return code(key) % m_cardinality;
   }
  private:
@@ -111,4 +113,4 @@ class hash_function<std::string> : public hasher<std::string> {
 
 }  // namespace esr
 
-#endif  // ESR_ESR_HASHER_FLYMAKE_HPP_
+#endif  // ESR_HASHER_FLYMAKE_HPP_

@@ -6,10 +6,11 @@
 #include <iomanip>
 #include <utility>
 #include <algorithm>
+#include <stdexcept>
+#include <cassert>
 
 #include <esr/hasher.hpp>
 #include <esr/linkedlist.hpp>
-#include <esr/assert.hpp>
 
 namespace esr {
 
@@ -33,6 +34,8 @@ class Hashtable {
   iterator find(const K& key);
 
   size_t size() { return m_size; }
+
+  // user may set 0
   size_t load_factor() const { return (m_LoadFactorMax*m_size)/m_bucket_count; }
 
   template <typename KK, typename VV>
@@ -87,7 +90,7 @@ class Hashtable {
   size_t m_bucket_count;
   linkedlist<K, V>* m_buckets;
   // utilization: empty, avg length of occupied
-  bool resize(size_t cardinality);
+  void resize(size_t cardinality);
 
   static const size_t m_LoadFactorMax = 100;  // 100%
   static const size_t m_LoadFactorBoundLowDefault = 49;  // 49%
@@ -165,7 +168,6 @@ typename Hashtable<K, V>::iterator& Hashtable<K, V>::iterator::operator++() {
   if (m_current_bucket_node_ptr == nullptr) {  //  end of current bucket
     // find not empty bucket starting from next one
     size_t next_bucket_idx = m_current_bucket_idx + 1;
-    // while (next_not_empty_bucket_idx < m_owner->m_bucket_count) {
     for (int i = next_bucket_idx; i < m_owner->m_bucket_count; ++i) {
       linkedlist<K, V>& next_bucket = m_owner->m_buckets[next_bucket_idx];
       if (next_bucket.empty()) {
@@ -188,7 +190,6 @@ typename Hashtable<K, V>::iterator& Hashtable<K, V>::iterator::operator++() {
       //               set curent bucket to last bucket
       //               set entry to end of last bucket
       m_current_bucket_idx = m_owner->m_bucket_count - 1;
-      m_current_bucket_node_ptr = nullptr;
     }
   }
   return *this;
@@ -198,9 +199,8 @@ template <typename K, typename V>
 listnode<K, V>& Hashtable<K, V>::iterator::operator*() {
   // unlikely // exception
   if (m_current_bucket_node_ptr == nullptr) {
-    // && m_current_bucket_idx == m_owner->m_bucket_count - 1;
-    _assert("dereferncing end iterator",
-            __ESR_PRETTY_FUNCTION__, __FILE__, __LINE__);
+    assert(m_current_bucket_idx == m_owner->m_bucket_count - 1);
+    throw std::out_of_range("dereferencing end iterator");
   }
   return *m_current_bucket_node_ptr;
 }
@@ -208,9 +208,8 @@ listnode<K, V>& Hashtable<K, V>::iterator::operator*() {
 template <typename K, typename V>
 listnode<K, V>* Hashtable<K, V>::iterator::operator->() {
   if (m_current_bucket_node_ptr == nullptr) {
-    // && m_current_bucket_idx == m_owner->m_bucket_count - 1;
-    _assert("dereferncing end iterator",
-            __ESR_PRETTY_FUNCTION__, __FILE__, __LINE__);
+    assert(m_current_bucket_idx == m_owner->m_bucket_count - 1);
+    throw std::out_of_range("dereferencing end iterator");
   }
   return m_current_bucket_node_ptr;
 }
@@ -238,10 +237,11 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::begin() {
     else
       break;
   }
-
+  assert(first_not_empty_bucket_idx <= m_bucket_count);
   // Empty hashtable, return end() interator
   if (first_not_empty_bucket_idx == m_bucket_count)
-    return end();  // iterator(this, m_bucket_count-1, nullptr);
+    return iterator(this, m_bucket_count-1, nullptr);
+  // don't want to return end(), because of following line
 
   // Stands at first entry of hashtable
   return iterator(this, first_not_empty_bucket_idx, bucket->front());
@@ -270,44 +270,44 @@ bool Hashtable<K, V>::add(const K& key, const V& value) {
   */
   // expand
   size_t factor = load_factor();
-  if (factor > m_load_factor_bound_up) {  // unlikely
-    if (!resize(2*m_bucket_count))
-      return false;
-  }
+  if (factor > m_load_factor_bound_up)  // unlikely
+    resize(2*m_bucket_count);
+
   size_t bucket_idx  = hash(key);
+  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+    throw std::out_of_range("bucket index is out of range");
+
   linkedlist<K, V>& bucket = m_buckets[bucket_idx];
   bool success = bucket.push_back(key, value);
   m_size += success ? 1 : 0;
+
   return success;
 }
 
 template <typename K, typename V>
 void Hashtable<K, V>::remove(const K& key) {
+  size_t bucket_idx = hash(key);
+  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+    throw std::out_of_range("bucket index is out of range");
+
+  bool success = m_buckets[bucket_idx].erase(key);
+  m_size -= (success ? 1 : 0);
+
   // shrink
   size_t factor = load_factor();
   if (factor < m_load_factor_bound_low) {  // 0.4 // unlikely
     size_t shrink_size = m_bucket_count/2;
     if (shrink_size >=  m_bucket_count_low)
-      if (!resize(m_bucket_count/2))
-        return;
+      resize(m_bucket_count/2);
   }
-  size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count) {
-    // out_of_range exception
-    return;
-  }
-  bool success = m_buckets[bucket_idx].erase(key);
-  m_size -= (success ? 1 : 0);
 }
-
 
 template <typename K, typename V>
 bool Hashtable<K, V>::set(const K& key, const V& value) {
   size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count) {
-    // out_of_range exception
-    return false;
-  }
+  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+    throw std::out_of_range("bucket index is out of range");
+
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
   if (node == nullptr)
     return false;
@@ -320,8 +320,8 @@ template <typename K, typename V>
 const V* Hashtable<K, V>::get(const K& key) const {
   size_t bucket_idx = hash(key);
   if (bucket_idx < 0 || bucket_idx >= m_bucket_count) {
-    // out_of_range exception
-    return nullptr;
+    throw std::out_of_range("bucket index is out of range");
+    // return nullptr;
   }
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
   if (node == nullptr)
@@ -334,8 +334,8 @@ template <typename K, typename V>
 typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
   size_t bucket_idx = hash(key);
   if (bucket_idx < 0 || bucket_idx >= m_bucket_count) {
-    // out_of_range exception replaces following line
-    return iterator(this, m_bucket_count-1, nullptr);  // end();
+    throw std::out_of_range("bucket index is out of range");
+    // silent: return iterator(this, m_bucket_count-1, nullptr) or end();
   }
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
   if (node == nullptr)
@@ -348,7 +348,7 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
 // Resize
 ////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
-bool Hashtable<K, V>::resize(size_t bucket_count) {
+void Hashtable<K, V>::resize(size_t bucket_count) {
   // std::cerr << "resize to: " << bucket_count << '\n';
   // reasign current iterator
   // no, add with iteration
@@ -361,12 +361,10 @@ bool Hashtable<K, V>::resize(size_t bucket_count) {
     linkedlist<K, V>& bucket = m_buckets[i];
     for (listnode<K, V>* node = bucket.front(); node; node = node->next()) {
       size_t bucket_idx = hash(node->key());
-      if (bucket_idx < 0 || bucket_idx >= bucket_count) {
-        // excpt. wrong hash index: public out_of_range
-        return false;
-      }
-      if (!table[bucket_idx].push_back(node->key(), node->value()))
-        return false;
+      if (bucket_idx < 0 || bucket_idx >= bucket_count)
+        throw std::out_of_range("bucket index is out of range");
+
+      assert(table[bucket_idx].push_back(node->key(), node->value()));
     }
   }
   ptr.release();
@@ -374,10 +372,6 @@ bool Hashtable<K, V>::resize(size_t bucket_count) {
   delete [] m_buckets;
   m_bucket_count = bucket_count;
   m_buckets = table;
-
-  // m_size successfully added
-
-  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
