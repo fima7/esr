@@ -7,7 +7,7 @@
 #include <ostream>
 
 #include <esr/hashtable.hpp>
-
+// https://en.wikipedia.org/wiki/List_of_cities_in_Germany_by_population
 const size_t kWordsInLineOfDataFile = 6;
 
 namespace ret {
@@ -124,7 +124,9 @@ int main(int argc, char *argv[]) {
     return -ret::file_error;
   }
 
-  std::vector<city::city> STL_CITIES;
+  esr::Hashtable<city::hkey, uint32_t> population_table;
+
+  std::cout << "Data: " << std::flush;
 
   while (file.good()) {
     std::vector<std::string> line;
@@ -150,102 +152,94 @@ int main(int argc, char *argv[]) {
       city.population = std::stoul(line[3]);
       city.area = std::stoul(line[4]);
       city.state = line[5];
-      STL_CITIES.push_back(city);
+      city::hkey key(city);
+      population_table.add(key, city.population);
     }
   }
   file.close();
 
-  esr::Hashtable<city::hkey, uint32_t> city_data_table;
+  std::cout << population_table.size() << " entries\n";
+  std::cout << "\n";
 
-  std::cout << "DATA: " << std::flush;
-  for (auto& city : STL_CITIES) {
-    city::hkey key(city);
-    city_data_table.add(key, city.population);
-  }
-  std::cout << city_data_table.size() << " entries\n";
-
-  std::cout << "YEARS: " << std::flush;
-  esr::Hashtable<int, uint16_t> city_year_table;
-  auto end = city_year_table.end();
-  for (auto& city : city_data_table) {
-    auto found = city_year_table.find(city.key().year);
-    if (found != end)
-      ++found->value();
+  std::cout << "Population by years: " << std::flush;
+  esr::Hashtable<int, uint64_t> year_table;
+  for (auto& city : population_table) {
+    auto found = year_table.find(city.key().year);
+    if (found == year_table.end())
+      year_table.add(city.key().year, city.value());
     else
-      city_year_table.add(city.key().year, 1);
+      found->value() += city.value();
   }
-  std::cout << city_year_table.size() << " entries \n";
-  for (auto& year : city_year_table)
-    std::cout << " " << year.value()  << " cities in "
+  std::cout << year_table.size() << " entries \n";
+  for (auto& year : year_table)
+    std::cout << " " << year.value()  << " inhabitants in"
               << " " << year.key() << "\n";
+  std::cout << "\n";
 
-  std::cout << "STATUS: " << std::flush;
-  esr::Hashtable<std::string, bool> city_status_table;
-  for (auto& city : city_data_table)
-    city_status_table.add(city.key().name, city.key().is_capital);
-  std::cout << city_status_table.size() << " entries.\n";
+  std::cout << "Population by city statuses, avg.( ";
 
-  uint32_t number_of_capitals = 0;
-  uint32_t number_of_secondaries = 0;
-  for (auto& status : city_status_table) {
-    bool is_capital = status.value();
-    if (is_capital)
-      ++number_of_capitals;
+  for (auto& year : year_table)
+    std::cout << year.key() << " ";
+  std::cout << ") : ";
+
+  esr::Hashtable<bool, uint64_t> statuses_table;
+  for (auto& city : population_table) {
+    auto found = statuses_table.find(city.key().is_capital);
+    if (found == statuses_table.end())
+      statuses_table.add(city.key().is_capital,
+                         city.value() / year_table.size());
     else
-      ++number_of_secondaries;
+      found->value() += city.value() / year_table.size();
   }
-  std::cout << " " << number_of_capitals << " capitals\n"
-            << " " << number_of_secondaries << " secondaries\n";
+  std::cout << statuses_table.size() << " entries \n";
+  for (auto& status : statuses_table)
+    std::cout << " " << status.value()  << " inhabitants in "
+              << (status.key() ? "capitals" : "secondary cities") << "\n";
+  std::cout << "\n";
 
-  std::cout << "AREA: " << std::flush;
-  esr::Hashtable<std::string, int> city_area_table;
-  for (auto& city : city_data_table)
-    city_area_table.add(city.key().name, city.key().area);
-  std::cout << city_area_table.size() << " entries\n";
+  std::cout << "Population by States avg.( ";
+  for (auto& year : year_table)
+    std::cout << year.key() << " ";
+  std::cout << ") : ";
 
-
-  uint64_t total_area = 0;
-  for (auto& city : city_area_table)
-      total_area += city.value();
-
-  std::cout << " " << total_area << " sq.km of "
-            << city_area_table.size() << " cities.\n";
-
-  std::cout << "STATE: " << std::flush;
-  esr::Hashtable<std::string, std::string> city_state_table;
-  esr::Hashtable<std::string, int> city_state_counter_table;
-  for (auto& city : city_data_table) {
-    city_state_table.add(city.key().name, city.key().state);
-    auto found = city_state_counter_table.find(city.key().state);
-    if (found != city_state_counter_table.end())
-      ++found->value();
+  esr::Hashtable<std::string, uint64_t> states_table;
+  for (auto& city : population_table) {
+    auto found = states_table.find(city.key().state);
+    if (found == states_table.end())
+      states_table.add(city.key().state, city.value() / year_table.size());
     else
-      city_state_counter_table.add(city.key().state, 1);
+      found->value() += city.value() / year_table.size();
+  }
+  std::cout << states_table.size() << " entries \n";
+  for (auto& state : states_table)
+    std::cout << " " << state.value()  << " inhabitants in "
+              << state.key() << "\n";
+  std::cout << "\n";
+
+  std::cout << "Random access test: ";
+  esr::Hashtable<int, city::hkey> keys_table;
+  for (auto& population : population_table) {
+    uint32_t population_cout_expected = population.value();
+    keys_table.add(population_cout_expected, population.key());
+  }
+  std::cout << keys_table << '\n';
+
+  for (auto& key : keys_table) {
+    auto found = population_table.find(key.value());
+    if (found == population_table.end()) {
+      std::cout << "failed.\n";
+      break;
+    } else {
+      if ( key.key() != found->value() ) {
+        std::cout << "failed "
+                  << key.key() << " and "
+                  << found->value() << "differs.\n";
+      }
+    }
   }
 
-  std::cout << "total " << city_state_counter_table.size() << "\n";
-  std::cout << city_state_counter_table <<'\n';
+  std::cout << "success.\n";
 
-
-  
-
-  
-  /*
-  std::cout << "Iterator test: " << std::flush;
-  for (auto& city : city_data_table) {
-    std::cout << city.key().year << " - "
-              << city.key().name << ": "
-              << city.value() << '\n' << std::flush;
-  }
-  */
-  /*
-  std::cout << "Cities" << std::flush;
-  for (auto& city : STL_CITIES) {
-    city::hkey key(city);
-    city_data_table.add(key, city.population);
-  }
-  */ 
-  
   return ret::success;
 }
 
