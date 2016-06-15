@@ -222,7 +222,6 @@ int main(int argc, char *argv[]) {
     uint32_t population_cout_expected = population.value();
     keys_table.add(population_cout_expected, population.key());
   }
-  std::cout << keys_table << '\n';
 
   for (auto& key : keys_table) {
     auto found = population_table.find(key.value());
