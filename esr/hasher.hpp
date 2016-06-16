@@ -22,7 +22,7 @@ class hasher {
 
 template<typename K>
 class hash_function : public hasher<K> {};
-
+#if 0
 template <>
 class hash_function<int> : public hasher<int> {
  public:
@@ -40,6 +40,14 @@ class hash_function<int> : public hasher<int> {
     return (m_a*key + m_b) % m_prime;
   }
 };
+#else
+template <>
+class hash_function<int> : public hasher<int> {
+ public:
+  explicit hash_function(int cardinality = 1) : hasher<int>(cardinality) {}
+  uint64_t code(const int& key) const { return key; }
+};
+#endif
 
 template <>
 class hash_function<bool> : public hasher<bool> {
@@ -68,7 +76,7 @@ class hash_function<char> : public hasher<char> {
   }
 };
 
-#if 1
+#if 0
 template <>
 class hash_function<std::string> : public hasher<std::string> {
  public:
@@ -88,7 +96,7 @@ class hash_function<std::string> : public hasher<std::string> {
     return h;
   }
 };
-#elif
+#else
 template <>
 class hash_function<std::string> : public hasher<std::string> {
  public:
