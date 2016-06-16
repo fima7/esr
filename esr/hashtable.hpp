@@ -257,7 +257,7 @@ bool Hashtable<K, V>::set(const K& key, const V& value) {
   }
 
   size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+  if (bucket_idx >= m_bucket_count)
     throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
@@ -276,7 +276,7 @@ const V* Hashtable<K, V>::get(const K& key) const {
   }
 
   size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+  if (bucket_idx >= m_bucket_count)
     throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
@@ -294,7 +294,7 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
   }
 
   size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+  if (bucket_idx >= m_bucket_count)
     throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
@@ -322,7 +322,7 @@ bool Hashtable<K, V>::add(const K& key, const V& value) {
     resize(2*m_bucket_count);
 
   size_t bucket_idx  = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+  if (bucket_idx >= m_bucket_count)
     throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   linkedlist<K, V>& bucket = m_buckets[bucket_idx];
@@ -340,7 +340,7 @@ void Hashtable<K, V>::remove(const K& key) {
   }
 
   size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+  if (bucket_idx >= m_bucket_count)
     throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   bool success = m_buckets[bucket_idx].erase(key);
@@ -362,13 +362,10 @@ void Hashtable<K, V>::remove(const K& key) {
 
 template <typename K, typename V>
 void Hashtable<K, V>::resize(size_t bucket_count) {
-  // std::cerr << "resize to: " << bucket_count << '\n';
-  // reasign current iterator
-  // no, add with iteration
   assert(bucket_count != m_bucket_count);
   size_t size = 0;
   linkedlist<K, V>* table = nullptr;
-  if (bucket_count > 0) {
+  if (bucket_count != 0) {
     std::unique_ptr<linkedlist<K, V>[]> ptr(new linkedlist<K, V>[bucket_count]);
     table = ptr.get();
     hash = hash_function<K>(bucket_count);  // new hash function from family
