@@ -32,7 +32,7 @@ class Hashtable {
   const V* get(const K& key) const;
   iterator find(const K& key);
 
-  size_t size() { return m_size; }
+  size_t size() const { return m_size; }
 
   // user may set 0
   size_t load_factor() const {
