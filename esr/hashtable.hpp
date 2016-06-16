@@ -14,36 +14,63 @@
 
 namespace esr {
 
+////////////////////////////////////////////////////////////////////////////////
+/// @class Hashtable
+///
+/// @brief Hashtable implementation.
+/// Data structure uses hashing with chaining to store data as
+/// an array of liked lists.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
 class Hashtable {
  public:
   class iterator;
 
+  /// Default constructor, creates Hashtable
   explicit Hashtable(size_t load_factor_bound_low = m_LoadFactorBoundLowDefault,
                      size_t load_factor_bound_up = m_LoadFactorBoundUpDefault);
+
+  /// Copy constructor, creates copy of Hashtable
   Hashtable(const Hashtable& other);
-  Hashtable& operator=(Hashtable other);
+
+  /// Destructor, deletes Hashteble
   virtual ~Hashtable();
 
+  /// Assignment operator
+  Hashtable& operator=(Hashtable other);
+
+  /// Adds key, value to hashtable
   bool add(const K& key, const V& value);
+
+  /// Removes key from hashtable
   void remove(const K& key);
 
+  /// Sets the value by key
   bool set(const K& key, const V& value);
+
+  /// Gets constant pointer to value by key
   const V* get(const K& key) const;
+
+  /// Finds a value by key
   iterator find(const K& key);
 
+  /// Gets a number of elements in hashtable
   size_t size() const { return m_size; }
 
-  // user may set 0
+  /// Gets average number of elements in bucket
   size_t load_factor() const {
     return (
         (m_bucket_count == 0) ?
         0 : (m_LoadFactor100Percents*m_size)/m_bucket_count);
   }
 
+  /// Hashtable's printer
   template <typename KK, typename VV>
   friend ostream & operator<<(ostream & os, const Hashtable<KK, VV> & ht);
 
+  /// Forward iterator
   class iterator {
     // friend void swap(iterator& lhs, iterator& rhs); //C++11
     // void swap(ForwardIterator& other) noexcept
@@ -53,6 +80,12 @@ class Hashtable {
     //}
 
    public:
+    /// Creates Hashtable's iterator
+    /// @param owner is a Hashtable object, owner of the iterator.
+    /// @param current_bucket_idx is a number of the current bucket
+    /// in bucket's array.
+    /// @param current_bucket_node_ptr is a pointer to the current node in
+    /// the current bucket.
     explicit iterator(Hashtable* owner,
                       size_t current_bucket_idx,
                       listnode<K, V>* current_bucket_node_ptr) :
@@ -60,38 +93,65 @@ class Hashtable {
         m_current_bucket_idx(current_bucket_idx),
         m_current_bucket_node_ptr(current_bucket_node_ptr) {}
 
+    /// Advances the iterator to the next element.
     iterator& operator++();
+
+    /// Dereferenses an iterator.
     listnode<K, V>& operator*();
+
+    /// Dereferenses an iterator.
     listnode<K, V>* operator->();
 
+    /// Inequality comparison of iterators.
     bool operator!=(const iterator& rhs);
+
+    /// Equality comparison of iterators.
     bool operator==(const iterator& rhs);
 
    private:
+    /// Owner of the iterator
     Hashtable* m_owner;
+    /// Number of the current bucket in the bucket array.
     size_t m_current_bucket_idx;
+    /// Pointer to the current node in the current bucket.
     listnode<K, V>* m_current_bucket_node_ptr;
   };
+
+  /// Gets begin of Hashtable.
   iterator begin();
+
+  /// Gets end of Hashtable.
   iterator end();
 
  private:
+  /// Number of elements in Hashtable.
   uint64_t m_size;
 
+  /// Hash function to get a bucket number in bucket array by key.
   hash_function<K> hash;
 
+  /// Load factor low threshold.
   size_t m_load_factor_bound_low;
+
+  /// Load factor upper threshold.
   size_t m_load_factor_bound_up;
 
+  /// Number of buckets in Hashtable, size of bucket array.
   size_t m_bucket_count;
-  linkedlist<K, V>* m_buckets;
-  // utilization: empty, avg length of occupied
-  void resize(size_t cardinality);
 
+  /// Bucket array, an array of linked lists.
+  linkedlist<K, V>* m_buckets;
+
+  /// Resizes bucket array, to new size.
+  /// @param bucket_count is a size of resized bucket array.
+  void resize(size_t bucket_count);
+
+  /// Load factor 100%
   static const size_t m_LoadFactor100Percents = 100;  // size == buckets, 100%
-  static const size_t m_LoadFactorBoundLowDefault = 49;  // 49%
-  static const size_t m_LoadFactorBoundUpDefault = 99;  // 99%
-  static const size_t m_BucketCountLowDefault = 8;  // minimum number of buckets
+  /// Default value of load factor's low theshold (%).
+  static const size_t m_LoadFactorBoundLowDefault = 49;
+  /// Default value of load factor's upper theshold (%).
+  static const size_t m_LoadFactorBoundUpDefault = 99;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -103,8 +163,6 @@ template <typename K, typename V>
 const size_t Hashtable<K, V>::m_LoadFactorBoundUpDefault;
 template <typename K, typename V>
 const size_t Hashtable<K, V>::m_LoadFactorBoundLowDefault;
-template <typename K, typename V>
-const size_t Hashtable<K, V>::m_BucketCountLowDefault;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Constructors, Destructor and Assignments
@@ -314,7 +372,7 @@ template <typename K, typename V>
 bool Hashtable<K, V>::add(const K& key, const V& value) {
   // first element
   if (m_size == 0)
-    resize(1/*m_BucketCountLowDefault*/);
+    resize(1);
 
   // expand
   size_t factor = load_factor();
