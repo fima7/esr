@@ -359,6 +359,7 @@ int main() {
       shared_ptr<esr_test::CopyAssignmentTest<std::string, int>>
       (new esr_test::CopyAssignmentTest<std::string, int>
        (16, "<string, int>")));
+
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<int, std::string>>
       (new esr_test::CopyAssignmentTest<int, std::string>
@@ -434,7 +435,6 @@ int main() {
   correctness_tests.push_back(
       shared_ptr<esr_test::DeletionTest<bool, bool>>
       (new esr_test::DeletionTest<bool, bool>(1, "<bool, bool>")));
-
 
   for (auto test : correctness_tests) {
     std::cout << test->name()
