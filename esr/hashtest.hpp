@@ -5,7 +5,7 @@
 #include <string>
 
 #include <esr/hashtable.hpp>
-#include <esr/assert.hpp>
+#include <esr/hashexcept.hpp>
 
 namespace esr_test {
 

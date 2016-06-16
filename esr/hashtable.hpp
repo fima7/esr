@@ -6,11 +6,11 @@
 #include <iomanip>
 #include <utility>
 #include <algorithm>
-#include <stdexcept>
 #include <cassert>
 
 #include <esr/hasher.hpp>
 #include <esr/linkedlist.hpp>
+#include <esr/hashexcept.hpp>
 
 namespace esr {
 
@@ -200,7 +200,8 @@ listnode<K, V>& Hashtable<K, V>::iterator::operator*() {
   // unlikely // exception
   if (m_current_bucket_node_ptr == nullptr) {
     assert(m_current_bucket_idx == m_owner->m_bucket_count - 1);
-    throw std::out_of_range("dereferencing end iterator");
+    throw exception::end_iterator(m_current_bucket_idx,
+                                  __ESR_PRETTY_FUNCTION__);
   }
   return *m_current_bucket_node_ptr;
 }
@@ -209,7 +210,8 @@ template <typename K, typename V>
 listnode<K, V>* Hashtable<K, V>::iterator::operator->() {
   if (m_current_bucket_node_ptr == nullptr) {
     assert(m_current_bucket_idx == m_owner->m_bucket_count - 1);
-    throw std::out_of_range("dereferencing end iterator");
+    throw exception::end_iterator(m_current_bucket_idx,
+                                  __ESR_PRETTY_FUNCTION__);
   }
   return m_current_bucket_node_ptr;
 }
@@ -268,6 +270,11 @@ bool Hashtable<K, V>::add(const K& key, const V& value) {
   if (m_buckets == nullptr)
     m_buckets =  new linkedlist[m_BucketCountLowDefault];
   */
+  // throw exception::hashtable(__ESR_PRETTY_FUNCTION__);
+
+  // first element
+ 
+  
   // expand
   size_t factor = load_factor();
   if (factor > m_load_factor_bound_up)  // unlikely
@@ -275,7 +282,7 @@ bool Hashtable<K, V>::add(const K& key, const V& value) {
 
   size_t bucket_idx  = hash(key);
   if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
-    throw std::out_of_range("bucket index is out of range");
+    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   linkedlist<K, V>& bucket = m_buckets[bucket_idx];
   bool success = bucket.push_back(key, value);
@@ -288,7 +295,7 @@ template <typename K, typename V>
 void Hashtable<K, V>::remove(const K& key) {
   size_t bucket_idx = hash(key);
   if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
-    throw std::out_of_range("bucket index is out of range");
+    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   bool success = m_buckets[bucket_idx].erase(key);
   m_size -= (success ? 1 : 0);
@@ -306,7 +313,7 @@ template <typename K, typename V>
 bool Hashtable<K, V>::set(const K& key, const V& value) {
   size_t bucket_idx = hash(key);
   if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
-    throw std::out_of_range("bucket index is out of range");
+    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
   if (node == nullptr)
@@ -319,10 +326,9 @@ bool Hashtable<K, V>::set(const K& key, const V& value) {
 template <typename K, typename V>
 const V* Hashtable<K, V>::get(const K& key) const {
   size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count) {
-    throw std::out_of_range("bucket index is out of range");
-    // return nullptr;
-  }
+  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
+
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
   if (node == nullptr)
     return nullptr;
@@ -333,10 +339,9 @@ const V* Hashtable<K, V>::get(const K& key) const {
 template <typename K, typename V>
 typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
   size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count) {
-    throw std::out_of_range("bucket index is out of range");
-    // silent: return iterator(this, m_bucket_count-1, nullptr) or end();
-  }
+  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
+
   listnode<K, V>* node = m_buckets[bucket_idx].find(key);
   if (node == nullptr)
     return iterator(this, m_bucket_count-1, nullptr);
@@ -362,9 +367,10 @@ void Hashtable<K, V>::resize(size_t bucket_count) {
     for (listnode<K, V>* node = bucket.front(); node; node = node->next()) {
       size_t bucket_idx = hash(node->key());
       if (bucket_idx < 0 || bucket_idx >= bucket_count)
-        throw std::out_of_range("bucket index is out of range");
+        throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
-      assert(table[bucket_idx].push_back(node->key(), node->value()));
+      bool success = table[bucket_idx].push_back(node->key(), node->value());
+      assert(success);
     }
   }
   ptr.release();

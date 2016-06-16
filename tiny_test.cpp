@@ -1,14 +1,40 @@
 // Copyright 2016
 #include <iostream>
 #include <string>
+#include <stdexcept>
+
 #include <esr/hashtable.hpp>
+#include <esr/hashexcept.hpp>
 
 int main(int argc, char *argv[]) {
-
   esr::Hashtable<int, int> table;
-  table.add(5, 8);
-  table.add(7, 8);
-  std::cerr << table << '\n';
+  // esr::Hashtable<int, int>::iterator ee = table.end();
+  // *ee;
+  try {
+    table.add(5, 8);
+    table.add(7, 8);
+    std::cerr << table << '\n';
+    // esr::Hashtable<int, int>::iterator ee = table.end();
+    // *ee;
+  } catch (esr::exception::end_iterator& e) {
+    std::cerr << "error iterating hashtable: "
+              << e.what() << '\n'
+              << " current bucket index: "
+              << e.current_bucket_index() << '\n';
+    throw;
+  } catch (esr::exception::bucket_index& e) {
+    std::cerr << "error adding to hashtable: "
+              << e.what() << '\n'
+              << " index: " << e.index() << '\n';
+    throw;
+  } catch (esr::exception::hashtable& e) {
+    std::cerr << "add to hashtable exception: " << e.what() << '\n';
+    std::cerr << " thrown by: " << e.who() << '\n';
+    throw;
+  } catch(...) {
+    std::cerr << "unexpecetd error\n";
+    throw;
+  }
 
   esr::Hashtable<int, int> table_copy(table);
   std::cerr << "Copy\n";
