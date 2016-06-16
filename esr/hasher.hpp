@@ -13,7 +13,7 @@ class hasher {
   explicit hasher(size_t cardinality) : m_cardinality(cardinality) {}
   virtual uint64_t code(const K& key) const = 0;
   size_t operator()(const K& key) const {
-    assert(m_cardinality > 0);
+    assert(m_cardinality != 0);
     return code(key) % m_cardinality;
   }
  private:

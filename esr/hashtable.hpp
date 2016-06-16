@@ -19,8 +19,7 @@ class Hashtable {
  public:
   class iterator;
 
-  explicit Hashtable(size_t bucket_count_low = m_BucketCountLowDefault,
-                     size_t load_factor_bound_low = m_LoadFactorBoundLowDefault,
+  explicit Hashtable(size_t load_factor_bound_low = m_LoadFactorBoundLowDefault,
                      size_t load_factor_bound_up = m_LoadFactorBoundUpDefault);
   Hashtable(const Hashtable& other);
   Hashtable& operator=(Hashtable other);
@@ -36,7 +35,11 @@ class Hashtable {
   size_t size() { return m_size; }
 
   // user may set 0
-  size_t load_factor() const { return (m_LoadFactorMax*m_size)/m_bucket_count; }
+  size_t load_factor() const {
+    return (
+        (m_bucket_count == 0) ?
+        0 : (m_LoadFactor100Percents*m_size)/m_bucket_count);
+  }
 
   template <typename KK, typename VV>
   friend ostream & operator<<(ostream & os, const Hashtable<KK, VV> & ht);
@@ -60,15 +63,9 @@ class Hashtable {
     iterator& operator++();
     listnode<K, V>& operator*();
     listnode<K, V>* operator->();
-    
+
     bool operator!=(const iterator& rhs);
     bool operator==(const iterator& rhs);
-
-    /*
-    K& key() {}
-    V& value() {}
-    const V& value() const {}
-    */
 
    private:
     Hashtable* m_owner;
@@ -85,14 +82,13 @@ class Hashtable {
 
   size_t m_load_factor_bound_low;
   size_t m_load_factor_bound_up;
-  size_t m_bucket_count_low;
 
   size_t m_bucket_count;
   linkedlist<K, V>* m_buckets;
   // utilization: empty, avg length of occupied
   void resize(size_t cardinality);
 
-  static const size_t m_LoadFactorMax = 100;  // 100%
+  static const size_t m_LoadFactor100Percents = 100;  // size == buckets, 100%
   static const size_t m_LoadFactorBoundLowDefault = 49;  // 49%
   static const size_t m_LoadFactorBoundUpDefault = 99;  // 99%
   static const size_t m_BucketCountLowDefault = 8;  // minimum number of buckets
@@ -102,7 +98,7 @@ class Hashtable {
 // Constants
 ////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
-const size_t Hashtable<K, V>::m_LoadFactorMax;
+const size_t Hashtable<K, V>::m_LoadFactor100Percents;
 template <typename K, typename V>
 const size_t Hashtable<K, V>::m_LoadFactorBoundUpDefault;
 template <typename K, typename V>
@@ -114,16 +110,12 @@ const size_t Hashtable<K, V>::m_BucketCountLowDefault;
 // Constructors, Destructor and Assignments
 ////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
-Hashtable<K, V>::Hashtable(size_t bucket_count_low,   // user may set 0
-                           size_t load_factor_bound_low,
+Hashtable<K, V>::Hashtable(size_t load_factor_bound_low,
                            size_t load_factor_bound_up) :
-    hash(bucket_count_low),  // user may set 0
+    hash(0),
     m_size(0),
-    // always allocates/deletes m_BucketCountLowDefault lists in copy assignment
-    // rather than anoyng user to provide BucketCountLow
-    m_buckets(new linkedlist<K, V>[bucket_count_low]),  // user may set 0
-    m_bucket_count(bucket_count_low),
-    m_bucket_count_low(bucket_count_low),
+    m_bucket_count(0),
+    m_buckets(nullptr),
     m_load_factor_bound_low(load_factor_bound_low),
     m_load_factor_bound_up(load_factor_bound_up) {
 }
@@ -134,10 +126,10 @@ Hashtable<K, V>::Hashtable(const Hashtable& other) :
     hash(other.hash),
     m_load_factor_bound_low(other.m_load_factor_bound_low),
     m_load_factor_bound_up(other.m_load_factor_bound_up),
-    m_bucket_count_low(other.m_bucket_count_low),
     m_bucket_count(other.m_bucket_count),
-    // null m_bucket_count == 0
-    m_buckets(new linkedlist<K, V>[other.m_bucket_count]) {
+    m_buckets(
+        (other.m_bucket_count > 0) ?
+        (new linkedlist<K, V>[other.m_bucket_count]) : (nullptr)) {
   for (int i = 0; i < m_bucket_count; ++i)
     m_buckets[i] = other.m_buckets[i];
 }
@@ -148,7 +140,6 @@ Hashtable<K, V>& Hashtable<K, V>::operator=(Hashtable other) {
   std::swap(hash, other.hash);  // check function
   std::swap(m_load_factor_bound_low, other.m_load_factor_bound_low);
   std::swap(m_load_factor_bound_up, other.m_load_factor_bound_up);
-  std::swap(m_bucket_count_low, other.m_bucket_count_low);
   std::swap(m_bucket_count, other.m_bucket_count);
   std::swap(m_buckets, other.m_buckets);
   return *this;
@@ -258,23 +249,73 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::end() {
 ////////////////////////////////////////////////////////////////////////////////
 // Accessors and Modifiers
 ////////////////////////////////////////////////////////////////////////////////
+template <typename K, typename V>
+bool Hashtable<K, V>::set(const K& key, const V& value) {
+  if (m_size == 0) {
+    assert(((m_buckets == nullptr) &&  (m_bucket_count == 0)));
+    return false;  // end() iterator
+  }
+
+  size_t bucket_idx = hash(key);
+  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
+
+  listnode<K, V>* node = m_buckets[bucket_idx].find(key);
+  if (node == nullptr)
+    return false;
+
+  node->set(value);
+  return true;
+}
+
+template <typename K, typename V>
+const V* Hashtable<K, V>::get(const K& key) const {
+  if (m_size == 0) {
+    assert(((m_buckets == nullptr) &&  (m_bucket_count == 0)));
+    return nullptr;  // end() iterator
+  }
+
+  size_t bucket_idx = hash(key);
+  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
+
+  listnode<K, V>* node = m_buckets[bucket_idx].find(key);
+  if (node == nullptr)
+    return nullptr;
+
+  return &node->value();
+}
+
+template <typename K, typename V>
+typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
+  if (m_size == 0) {
+    assert(((m_buckets == nullptr) &&  (m_bucket_count == 0)));
+    return iterator(this, m_bucket_count-1, nullptr);  // end() iterator
+  }
+
+  size_t bucket_idx = hash(key);
+  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
+    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
+
+  listnode<K, V>* node = m_buckets[bucket_idx].find(key);
+  if (node == nullptr)
+    return iterator(this, m_bucket_count-1, nullptr);
+
+  return iterator(this, bucket_idx, node);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Isertions, Deletion, Resize
+////////////////////////////////////////////////////////////////////////////////
 // returns:
 // success true
 // fail false: bad hash function, refer to resize()
 template <typename K, typename V>
 bool Hashtable<K, V>::add(const K& key, const V& value) {
-  // Arguable, created with Hashtable(0) probably to avoid
-  // alloc dealloc in assignment while copy
-  // for usual case use  Hashtable()
-  /*
-  if (m_buckets == nullptr)
-    m_buckets =  new linkedlist[m_BucketCountLowDefault];
-  */
-  // throw exception::hashtable(__ESR_PRETTY_FUNCTION__);
-
   // first element
- 
-  
+  if (m_size == 0)
+    resize(1/*m_BucketCountLowDefault*/);
+
   // expand
   size_t factor = load_factor();
   if (factor > m_load_factor_bound_up)  // unlikely
@@ -293,89 +334,62 @@ bool Hashtable<K, V>::add(const K& key, const V& value) {
 
 template <typename K, typename V>
 void Hashtable<K, V>::remove(const K& key) {
+  if (m_size == 0) {
+    assert(((m_buckets == nullptr) &&  (m_bucket_count == 0)));
+    return;
+  }
+
   size_t bucket_idx = hash(key);
   if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
     throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   bool success = m_buckets[bucket_idx].erase(key);
-  m_size -= (success ? 1 : 0);
+  if (!success) return;  // no such key
+
+  --m_size;
 
   // shrink
   size_t factor = load_factor();
-  if (factor < m_load_factor_bound_low) {  // 0.4 // unlikely
-    size_t shrink_size = m_bucket_count/2;
-    if (shrink_size >=  m_bucket_count_low)
-      resize(m_bucket_count/2);
+  if (factor == 0) {
+    resize(0);
+    return;
+  }
+  if (factor < m_load_factor_bound_low) {  // unlikely
+    size_t shrunk_bucket_count = m_bucket_count/2;
+    resize(shrunk_bucket_count);
   }
 }
 
-template <typename K, typename V>
-bool Hashtable<K, V>::set(const K& key, const V& value) {
-  size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
-    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
-
-  listnode<K, V>* node = m_buckets[bucket_idx].find(key);
-  if (node == nullptr)
-    return false;
-
-  node->set(value);
-  return true;
-}
-
-template <typename K, typename V>
-const V* Hashtable<K, V>::get(const K& key) const {
-  size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
-    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
-
-  listnode<K, V>* node = m_buckets[bucket_idx].find(key);
-  if (node == nullptr)
-    return nullptr;
-
-  return &node->value();
-}
-
-template <typename K, typename V>
-typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
-  size_t bucket_idx = hash(key);
-  if (bucket_idx < 0 || bucket_idx >= m_bucket_count)
-    throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
-
-  listnode<K, V>* node = m_buckets[bucket_idx].find(key);
-  if (node == nullptr)
-    return iterator(this, m_bucket_count-1, nullptr);
-
-  return iterator(this, bucket_idx, node);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Resize
-////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
 void Hashtable<K, V>::resize(size_t bucket_count) {
   // std::cerr << "resize to: " << bucket_count << '\n';
   // reasign current iterator
   // no, add with iteration
-  std::unique_ptr<linkedlist<K, V>[]> ptr(new linkedlist<K, V>[bucket_count]);
-  linkedlist<K, V>* table = ptr.get();
-  hash = hash_function<K>(bucket_count);  // new hash function from family
+  assert(bucket_count != m_bucket_count);
+  size_t size = 0;
+  linkedlist<K, V>* table = nullptr;
+  if (bucket_count > 0) {
+    std::unique_ptr<linkedlist<K, V>[]> ptr(new linkedlist<K, V>[bucket_count]);
+    table = ptr.get();
+    hash = hash_function<K>(bucket_count);  // new hash function from family
 
-  // Rehash: add all entries of old table to new one
-  for (int i = 0; i < m_bucket_count; ++i) {
-    linkedlist<K, V>& bucket = m_buckets[i];
-    for (listnode<K, V>* node = bucket.front(); node; node = node->next()) {
-      size_t bucket_idx = hash(node->key());
-      if (bucket_idx < 0 || bucket_idx >= bucket_count)
-        throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
-
-      bool success = table[bucket_idx].push_back(node->key(), node->value());
-      assert(success);
+    // Rehash: add all entries of old table to new one
+    for (int i = 0; i < m_bucket_count; ++i) {
+      linkedlist<K, V>& bucket = m_buckets[i];
+      for (listnode<K, V>* node = bucket.front(); node; node = node->next()) {
+        size_t bucket_idx =  hash(node->key());
+        if (bucket_idx < 0 || bucket_idx >= bucket_count)
+          throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
+        bool success = table[bucket_idx].push_back(node->key(), node->value());
+        assert(success);
+        ++size;
+      }
     }
+    ptr.release();
+    if (m_buckets != nullptr)
+      delete [] m_buckets;
   }
-  ptr.release();
-
-  delete [] m_buckets;
+  m_size = size;
   m_bucket_count = bucket_count;
   m_buckets = table;
 }

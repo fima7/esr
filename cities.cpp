@@ -81,7 +81,7 @@ template <>
 class hash_function<city::hkey> :
       public esr::hasher<city::hkey> {
  public:
-  explicit hash_function(size_t cardinality,
+  explicit hash_function(size_t cardinality = 1,
                          size_t start = 17,
                          size_t prime = 31) :
       esr::hasher<city::hkey>(cardinality),
