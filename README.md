@@ -71,6 +71,7 @@ n is a number of elements in List.
 
 ### Performance evaluation
 #### Integer Keys
+|            | add                               |               find                   |
 | Input Size | Hashtable add | unordered_map add | Hash table find | unordered_map find |
 | ---------- | ------------- | ----------------- | --------------- | ------------------ |
 |  2	     | 0.003000	     | 0.003000		 |  0.000500	   |  0.000000	       	| 
