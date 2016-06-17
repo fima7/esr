@@ -317,45 +317,141 @@ bool linkedlist_deletion_test(size_t size, bool verbose) {
     std::cout << "\nlist<int, int> = { " << ll_expect << "}\n" << std::flush;
   }
 
-  std::cout << "delete from head\n";
+  // Delete from front
   ll_tmp = ll_expect;
   for (int key = 0; key < size; ++key) {
     ll_tmp.erase(key);
-
-    std::cout << "\nlist<int, int> = { " << ll_tmp << "}\n" << std::flush;
+    const esr::listnode<int, int>* found = ll_tmp.find(key);
+    if (found != nullptr) {
+      std::cout << "<int,int> found deleted value for key = "
+                << key << '\n' << std::flush;
+      return false;
+    }
+    for (int key_rest = key + 1; key_rest < size; ++key_rest) {
+      const esr::listnode<int, int>* found_rest = ll_tmp.find(key_rest);
+      const esr::listnode<int, int>* found_expect = ll_expect.find(key_rest);
+      if (found_rest == nullptr) {
+        std::cout << "<int,int> no element by with key = "
+                  << key_rest << '\n' << std::flush;
+        return false;
+      }
+      // Compare with expectations
+      if (found_rest->key() != found_expect->key()
+          || found_rest->value() != found_expect->value()) {
+        std::cout << "<int,int> found"
+                  << "key = " << found_rest->key() << " , "
+                  << "value = " << found_rest->value() << " "
+                  << "doesn't match expected "
+                  << "key = " << found_expect->key() << ", "
+                  << "value = " << found_expect->value() << ". "
+                  << std::flush;
+        return false;
+      }
+    }
   }
 
-  std::cout << "delete from tail\n";
+  // Delete from back
   ll_tmp = ll_expect;
   for (int key = size - 1; key >= 0; --key) {
     ll_tmp.erase(key);
-
-    std::cout << "\nlist<int, int> = { " << ll_tmp << "}\n" << std::flush;
+    const esr::listnode<int, int>* found = ll_tmp.find(key);
+    if (found != nullptr) {
+      std::cout << "<int,int> found deleted value for key = "
+                << key << '\n' << std::flush;
+      return false;
+    }
+    for (int key_rest = key - 1; key_rest >= 0; --key_rest) {
+      const esr::listnode<int, int>* found_rest = ll_tmp.find(key_rest);
+      const esr::listnode<int, int>* found_expect = ll_expect.find(key_rest);
+      if (found_rest == nullptr) {
+        std::cout << "<int,int> no element by with key = "
+                  << key_rest << '\n' << std::flush;
+        return false;
+      }
+      // Compare with expectations
+      if (found_rest->key() != found_expect->key()
+          || found_rest->value() != found_expect->value()) {
+        std::cout << "<int,int> found"
+                  << "key = " << found_rest->key() << " , "
+                  << "value = " << found_rest->value() << " "
+                  << "doesn't match expected "
+                  << "key = " << found_expect->key() << ", "
+                  << "value = " << found_expect->value() << ". "
+                  << std::flush;
+        return false;
+      }
+    }
   }
 
-  std::cout << "delete mid\n";
+  // Delete previous to back
   ll_tmp = ll_expect;
-  ll_tmp.erase(4);
-  std::cout << "\nlist<int, int> = { " << ll_tmp << "}\n" << std::flush;
+  ll_tmp.erase(size - 2);
 
-  std::cout << "delete next after head\n";
+  const esr::listnode<int, int>* found = ll_tmp.find(size - 2);
+  if (found != nullptr) {
+    std::cout << "<int,int> found deleted value for key = "
+              << key << '\n' << std::flush;
+    return false;
+  }
+
+  for (int key_rest = 0; key_rest < size; ++key_rest) {
+    if (key_rest == size - 2)
+      continue;
+    const esr::listnode<int, int>* found_rest = ll_tmp.find(key_rest);
+    const esr::listnode<int, int>* found_expect = ll_expect.find(key_rest);
+    if (found_rest == nullptr) {
+      std::cout << "<int,int> no element by with key = "
+                << key_rest << '\n' << std::flush;
+      return false;
+    }
+    // Compare with expectations
+    if (found_rest->key() != found_expect->key()
+        || found_rest->value() != found_expect->value()) {
+      std::cout << "<int,int> found"
+                << "key = " << found_rest->key() << " , "
+                << "value = " << found_rest->value() << " "
+                << "doesn't match expected "
+                << "key = " << found_expect->key() << ", "
+                << "value = " << found_expect->value() << ". "
+                << std::flush;
+      return false;
+    }
+  }
+
+  // Next to front
   ll_tmp = ll_expect;
   ll_tmp.erase(1);
-  std::cout << "\nlist<int, int> = { " << ll_tmp << "}\n" << std::flush;
+  found = nullptr;
+  found = ll_tmp.find(1);
+  if (found != nullptr) {
+    std::cout << "<int,int> found deleted value for key = "
+              << key << '\n' << std::flush;
+    return false;
+  }
 
-  std::cout << "delete prev to tail\n";
-  ll_tmp = ll_expect;
-  ll_tmp.erase(6);
-  std::cout << "\nlist<int, int> = { " << ll_tmp << "}\n" << std::flush;
-
-
-
-  // Delete first
-
-  // Delete last
-
-  // Delete mid
-
+  for (int key_rest = 0; key_rest < size; ++key_rest) {
+    if (key_rest == 1)
+      continue;
+    const esr::listnode<int, int>* found_rest = ll_tmp.find(key_rest);
+    const esr::listnode<int, int>* found_expect = ll_expect.find(key_rest);
+    if (found_rest == nullptr) {
+      std::cout << "<int,int> no element by with key = "
+                << key_rest << '\n' << std::flush;
+      return false;
+    }
+    // Compare with expectations
+    if (found_rest->key() != found_expect->key()
+        || found_rest->value() != found_expect->value()) {
+      std::cout << "<int,int> found"
+                << "key = " << found_rest->key() << " , "
+                << "value = " << found_rest->value() << " "
+                << "doesn't match expected "
+                << "key = " << found_expect->key() << ", "
+                << "value = " << found_expect->value() << ". "
+                << std::flush;
+      return false;
+    }
+  }
   return true;
 }
 
@@ -391,31 +487,29 @@ bool fake_object_test() {
   return true;
 }
 
+const int kLinkeListSize = 1024;
+
 int main(int argc, const char * argv[]) {
-#if 0
   if (!fake_object_test())
     std::cout << "[FAILED]\n" << std::flush;
   else
     std::cout << "[PASSED]\n" << std::flush;
 
-  if (!linkedlist_access_test(128, false))
+  if (!linkedlist_access_test(kLinkeListSize, false))
     std::cout << "[FAILED]\n" << std::flush;
   else
     std::cout << "[PASSED]\n" << std::flush;
-  if (!linkedlist_copy_test(128, false))
+  if (!linkedlist_copy_test(kLinkeListSize, false))
     std::cout << "[FAILED]\n" << std::flush;
   else
     std::cout << "[PASSED]\n" << std::flush;
-  if (!linkedlist_assignment_test(128, false))
+  if (!linkedlist_assignment_test(kLinkeListSize, false))
     std::cout << "[FAILED]\n" << std::flush;
   else
     std::cout << "[PASSED]\n" << std::flush;
-#else 
-  if (!linkedlist_deletion_test(8, true))
+  if (!linkedlist_deletion_test(kLinkeListSize, false))
     std::cout << "[FAILED]\n" << std::flush;
   else
     std::cout << "[PASSED]\n" << std::flush;
-#endif
-
   return 0;
 }
