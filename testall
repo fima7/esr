@@ -1,0 +1,17 @@
+#!/bin/sh
+
+echo "LINKED LIST TEST."
+./linkedlist_test
+echo "DONE"
+
+echo "HASH TABLE CORRECTNESS TEST."
+./correctness_test
+echo "DONE"
+
+echo "HASH TABLE PERFORMANCE TEST."
+./performance_test
+echo "DONE"
+
+echo "CITIES: an illustrative application."
+./cities ./data/cities.data
+echo "DONE"
