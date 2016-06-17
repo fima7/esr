@@ -35,7 +35,7 @@ class Hashtable {
   /// Copy constructor, creates copy of Hashtable
   Hashtable(const Hashtable& other);
 
-  /// Destructor, deletes Hashteble
+  /// Destructor, deletes Hashtable
   virtual ~Hashtable();
 
   /// Assignment operator
@@ -167,6 +167,15 @@ const size_t Hashtable<K, V>::m_LoadFactorBoundLowDefault;
 ////////////////////////////////////////////////////////////////////////////////
 // Constructors, Destructor and Assignments
 ////////////////////////////////////////////////////////////////////////////////
+
+/// @brief Default constructor for Hashtable.
+/// Creates Hashtable with load factor's low
+/// and upper thresholds.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param load_factor_bound_low is a load factor's low threshold.
+/// @param load_factor_bound_up is a load factor's upper threshold.
+/// @return nothing
 template <typename K, typename V>
 Hashtable<K, V>::Hashtable(size_t load_factor_bound_low,
                            size_t load_factor_bound_up) :
@@ -175,9 +184,15 @@ Hashtable<K, V>::Hashtable(size_t load_factor_bound_low,
     m_bucket_count(0),
     m_buckets(nullptr),
     m_load_factor_bound_low(load_factor_bound_low),
-    m_load_factor_bound_up(load_factor_bound_up) {
-}
+    m_load_factor_bound_up(load_factor_bound_up) {}
 
+/// @brief Copy constructor for Hashtable.
+/// Creates copy of existing Hashtable instance.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param other is an existing source Hashtable
+/// instance to be copied to target.
+/// @return nothing
 template <typename K, typename V>
 Hashtable<K, V>::Hashtable(const Hashtable& other) :
     m_size(other.m_size),
@@ -192,6 +207,14 @@ Hashtable<K, V>::Hashtable(const Hashtable& other) :
     m_buckets[i] = other.m_buckets[i];
 }
 
+/// @brief Assignment operator for Hashtable.
+/// Creates copy of existing Hashtable instance,
+/// cleaning up left-hand target.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param other is an existing source Hashtable
+/// instance to be copied to target.
+/// @return nothing
 template <typename K, typename V>
 Hashtable<K, V>& Hashtable<K, V>::operator=(Hashtable other) {
   std::swap(m_size, other.m_size);
@@ -203,6 +226,12 @@ Hashtable<K, V>& Hashtable<K, V>::operator=(Hashtable other) {
   return *this;
 }
 
+/// @brief Destructor for Hashtable.
+/// Removes content of Hashtable instance,
+/// deleting the bucket array.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @return nothing
 template <typename K, typename V>
 Hashtable<K, V>::~Hashtable() {
   delete [] m_buckets;
@@ -229,16 +258,17 @@ typename Hashtable<K, V>::iterator& Hashtable<K, V>::iterator::operator++() {
 
     if (next_not_empty_bucket_idx < m_owner->m_bucket_count) {
       // Next bucket less then bucket count:
-      //               set current to found bucket
-      //               entry to begin of bucket
+      //               set index to found bucket
+      //               set pointer to begin of bucket
       m_current_bucket_idx = next_not_empty_bucket_idx;
       linkedlist<K, V>& bucket = m_owner->m_buckets[m_current_bucket_idx];
       m_current_bucket_node_ptr = bucket.front();
     } else {
       // Next bucket equal or greater than bucket count
-      //               set curent bucket to last bucket
-      //               set entry to end of last bucket
+      //               set index to last bucket
+      //               set pointer to end of last bucket
       m_current_bucket_idx = m_owner->m_bucket_count - 1;
+      m_current_bucket_node_ptr = nullptr;
     }
   }
   return *this;
@@ -246,7 +276,7 @@ typename Hashtable<K, V>::iterator& Hashtable<K, V>::iterator::operator++() {
 
 template <typename K, typename V>
 listnode<K, V>& Hashtable<K, V>::iterator::operator*() {
-  // unlikely // exception
+  // unlikely
   if (m_current_bucket_node_ptr == nullptr) {
     assert(m_current_bucket_idx == m_owner->m_bucket_count - 1);
     throw exception::end_iterator(m_current_bucket_idx,
@@ -307,6 +337,18 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::end() {
 ////////////////////////////////////////////////////////////////////////////////
 // Accessors and Modifiers
 ////////////////////////////////////////////////////////////////////////////////
+
+/// @brief Set value
+/// Provides write access to Hashtable's element by it's key.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param key is a key of element.
+/// @param value is a value of element.
+/// @return result of setting a value.
+/// @retval true on success
+/// @retval false if no element with such key found in Hashtable.
+/// @throw bucket_index exception if a bucket number returned
+/// by the hash funtion is out of the bucket array range.
 template <typename K, typename V>
 bool Hashtable<K, V>::set(const K& key, const V& value) {
   if (m_size == 0) {
@@ -326,6 +368,15 @@ bool Hashtable<K, V>::set(const K& key, const V& value) {
   return true;
 }
 
+/// @brief Gets value by it's key.
+/// Provides read access to Hashtable's element by it's key using pointer.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param key is a key of element in Hashtable.
+/// @return valid constant pointer to element in Hashtable or
+/// nullptr if no element with such key found in Hashtable.
+/// @throw bucket_index exception if a bucket number returned
+/// by hash funtion is out of the bucket array range.
 template <typename K, typename V>
 const V* Hashtable<K, V>::get(const K& key) const {
   if (m_size == 0) {
@@ -344,6 +395,15 @@ const V* Hashtable<K, V>::get(const K& key) const {
   return &node->value();
 }
 
+/// @brief Gets value by it's key.
+/// Provides read access to Hashtable's element by it's key using iterator.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param key is a key to Hashtable's element.
+/// @return iterator to element if found, otherwise it returns
+/// an iterator to Hashtable::end.
+/// @throw bucket_index exception if a bucket number returned
+/// by hash funtion is out of the bucket array range.
 template <typename K, typename V>
 typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
   if (m_size == 0) {
@@ -363,11 +423,22 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Isertions, Deletion, Resize
+// Isertion, Deletion; private: Resize
 ////////////////////////////////////////////////////////////////////////////////
-// returns:
-// success true
-// fail false: bad hash function, refer to resize()
+/// @brief Adds an element.
+/// Inserts an element to Hashtable. Expands the bucket array to
+/// it's double size if load factor is grater than load factor's
+/// upper threshold.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param key is a key to Hashtable's element.
+/// @param value is a value of Hashtable's element.
+/// @return result of insertion.
+/// @retval true if an element has been successfully inserted.
+/// @retval false if an element with such key is already in a
+/// Hashtable.
+/// @throw bucket_index exception if a bucket number returned
+/// by hash funtion is out of the bucket array range.
 template <typename K, typename V>
 bool Hashtable<K, V>::add(const K& key, const V& value) {
   // first element
@@ -390,6 +461,16 @@ bool Hashtable<K, V>::add(const K& key, const V& value) {
   return success;
 }
 
+/// @brief Removes an element.
+/// Removes an element from Hashtable. Shrinks the bucket array to
+/// it's half size if load factor is less than load factor's
+/// low threshold.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param key is a key to Hashtable's element.
+/// @return nothing.
+/// @throw bucket_index exception if a bucket number returned
+/// by hash funtion is out of the bucket array range.
 template <typename K, typename V>
 void Hashtable<K, V>::remove(const K& key) {
   if (m_size == 0) {
@@ -418,6 +499,17 @@ void Hashtable<K, V>::remove(const K& key) {
   }
 }
 
+/// @brief Resizes bucket array.
+/// Creates new hashfunction with a cardinality equal to new
+/// buckets count. Creates new bucket array. Adds every element
+/// from source bucket array to new bucket array using new hash
+/// function. Deletes source bucket array.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param New bucket array size.
+/// @return nothing.
+/// @throw bucket_index exception if a bucket number returned
+/// by hash funtion is out of the bucket array range.
 template <typename K, typename V>
 void Hashtable<K, V>::resize(size_t bucket_count) {
   assert(bucket_count != m_bucket_count);
@@ -428,12 +520,12 @@ void Hashtable<K, V>::resize(size_t bucket_count) {
     table = ptr.get();
     hash = hash_function<K>(bucket_count);  // new hash function from family
 
-    // Rehash: add all entries of old table to new one
+    // Rehash: adds every entry of table to new one
     for (int i = 0; i < m_bucket_count; ++i) {
       linkedlist<K, V>& bucket = m_buckets[i];
       for (listnode<K, V>* node = bucket.front(); node; node = node->next()) {
         size_t bucket_idx =  hash(node->key());
-        if (bucket_idx < 0 || bucket_idx >= bucket_count)
+        if (bucket_idx >= bucket_count)
           throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
         bool success = table[bucket_idx].push_back(node->key(), node->value());
         assert(success);
