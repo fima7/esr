@@ -21,7 +21,7 @@ Hashtable::begin() : worst O(n), amortized O(1)
 Hashtable::end() : O(1)
 Hashtable::resize(size_t bucket_count) : O(n)
 
-Linked List
+Runtime of Linked List
 n is a number of elements in List.
 linkedlist::linkedlist() : O(1)
 linkedlist::linkedlist(const linkedlist& other) : O(n)
