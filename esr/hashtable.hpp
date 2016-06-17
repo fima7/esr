@@ -332,8 +332,8 @@ listnode<K, V>* Hashtable<K, V>::iterator::operator->() {
 /// and their current element pointers.
 /// @tparam K type of hash key.
 /// @tparam V type of hash value.
-/// @param reference to iterator.
-/// Right-hand side of a comparison expression.
+/// @param rhs is a reference to iterator instance,
+/// right-hand side of a comparison expression.
 /// @return result of the equality comparison.
 /// @retval true if current bucket indicies or
 /// current element pointers of both iterators are not equal.
@@ -578,7 +578,7 @@ void Hashtable<K, V>::remove(const K& key) {
 /// function. Deletes source bucket array.
 /// @tparam K type of hash key.
 /// @tparam V type of hash value.
-/// @param New bucket array size.
+/// @param bucket_count is a bucket array size.
 /// @return nothing.
 /// @throw bucket_index exception if a bucket number returned
 /// by hash funtion is out of the bucket array range.

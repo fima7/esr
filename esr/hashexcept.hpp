@@ -8,19 +8,13 @@
 #include <stdexcept>  // std::out_of_range
 #include <string>     // std::string.
 
-#ifdef __GNUC__
-#define __ESR_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
-#else
-#define __ESR_PRETTY_FUNCTION__ __func__
-#endif
 namespace esr {
-
 namespace exception {
 
 using std::string;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @class exception::hashtable.
+/// @class hashtable.
 ///
 /// @brief Hashtable exception.
 /// Common type for all Hashtable exceptions.
@@ -44,7 +38,7 @@ class hashtable: public std::out_of_range {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @class exception::bucket_index.
+/// @class bucket_index.
 ///
 /// @brief Bucket index exception.
 /// Index is out of range of bucket array.
@@ -68,7 +62,7 @@ class bucket_index: public hashtable {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @class exception::end_iterator.
+/// @class end_iterator.
 ///
 /// @brief End iterator exception.
 /// Attempt to dereference end iterator.
@@ -92,7 +86,12 @@ class end_iterator: public hashtable {
 };
 
 }  // namespace exception
-
 }  // namespace esr
+
+#ifdef __GNUC__
+#define __ESR_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
+#else
+#define __ESR_PRETTY_FUNCTION__ __func__
+#endif
 
 #endif  // ESR_HASHEXCEPT_FLYMAKE_HPP_
