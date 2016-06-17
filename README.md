@@ -1,15 +1,16 @@
 # Hashtable<K, V> 
-Implementation of Hash table with separate chaining method without using
+Implementation of Hash Table with separate chaining method without using
 any STL container classes.
 
 Hash table is implemented as a template class Hashtable&lt;K, V>. K is a type of key,
 V is a type of value.
 
 Hashtable&lt;K, V> structure is an array of buckets. A bucket is an object of
-LinkedList&lt;K V> class. LinkedList&lt;K, V> is an implementation of singly linked
+LinkedList&lt;K, V> class. LinkedList&lt;K, V> is an implementation of singly linked
 list customized to store values with unique keys.
 
 ## Runing times
+_Provided for keys with fixed length._
 
 ### Runtime of Hash Table
 n is a number of elements in Hashtable
@@ -71,6 +72,14 @@ with custom key type.
 2. > testall
 
 ### Performance evaluation
+* _HT_ stands for Hash Table.
+* _UM_ stands for std::unordered_map.
+* _ADD()_ insertions operation.
+* _FIND()_ retrieval operation.
+First column contains a number of elements in Hash Table.
+Next four columns contain CPU time in miliseconds consumed by one
+operation. 
+
 #### Integer Keys
 | Input Size | HT ADD() | UM ADD()   | HT FIND() | UM FIND() |
 | ---------- | -------- | ---------- | --------- | --------- |
