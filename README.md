@@ -11,7 +11,7 @@ list customized to store values with unique keys.
 
 ## Runing times
 
-### Runtime of Hashtable<K, V>
+### Runtime of Hash Table
 n is a number of elements in Hashtable
 * Hashtable::Hashtable() : O(1)
 * Hashtable::Hashtable(const Hashtable& other) : O(n)
@@ -50,6 +50,23 @@ n is a number of elements in List.
 ### Code example
 
 ### Files
+#### Hash Table
+* esr/hashtable.hpp
+	Implementation of Hashtable.
+* esr/hasher.hpp
+	Contins hash functions for some basic types.
+* esr/linkedlist.hpp
+	Linked List implementation.
+* esr/hashexcept.hpp
+#### Tests
+* esr/hashtest.hpp
+	Generic test classes to check the functional correctness of Hashtable.
+* ./correctness_test.hpp  
+  	Contains a number of tests for some basic types to check functional correctness
+	of Hashtable.
+* ./performance_test.cpp
+	Perfomance test using integer and std::string keys. Comparison of results with
+	std::unordered_map.
 
 ### Tests
 
