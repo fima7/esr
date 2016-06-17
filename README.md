@@ -2,11 +2,12 @@
 Implementation of Hash table with separate chaining method without using
 any STL container classes.
 
-Hash table inmplemented as a template class Hashtable<K, V>, K corresponds to
-type of key, V corresponds to type of value.
+Hash table is implemented as a template class Hashtable&lt;K, V>. K is a type of key,
+V is a type of value.
 
-Hashtable&lt;K, V> is implemented as an array of buckets. A bucket is a LinkedList&lt;K V> class.
-LinkedList&lt;K, V> is an implementation of singly linked list to store keys and values.
+Hashtable&lt;K, V> structure is an array of buckets. A bucket is an object of
+LinkedList&lt;K V> class. LinkedList&lt;K, V> is an implementation of singly linked
+list customized to store values with unique keys.
 
 ## Runing times
 
