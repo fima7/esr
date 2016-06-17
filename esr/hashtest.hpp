@@ -375,7 +375,6 @@ class DeletionTest : public InsertionRetrievalTest<K, V> {
     for (auto& expect : this->m_test_table) {
       temp.remove(expect.key());
       auto found = temp.find(expect.key());
-      /*
       if (found != temp.end()) {
         std::cout << __ESR_PRETTY_FUNCTION__ << ' '
                   << "(key = " << found->key() << ", "
@@ -384,18 +383,15 @@ class DeletionTest : public InsertionRetrievalTest<K, V> {
                   << std::flush;
         return false;
       }
-      */
     }
     return true;
   }
 
   bool rm_negative() {
-    /*
     esr::Hashtable<K, V> temp = this->m_test_table;
     for (auto& expect : this->m_negative_table) {
       temp.remove(expect.first);
     }
-    */
     return true;
   }
 };
