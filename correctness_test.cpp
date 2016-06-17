@@ -291,6 +291,8 @@ bool InsertionRetrievalTest<bool, bool>::make_expected_hashtable() {
 
 }  // namespace esr_test
 
+const size_t kIntegerKeysCount = (1024*1024);
+const size_t kStringKeysCount = 10000;
 
 int main() {
   std::vector<shared_ptr<esr_test::CorrectnessTest>> correctness_tests;
@@ -299,40 +301,42 @@ int main() {
 ////////////////////////////////////////////////////////////////////////////////
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<int, int>>
-      (new esr_test::InsertionRetrievalTest<int, int>(16, "<int, int>")));
+      (new esr_test::InsertionRetrievalTest<int, int>
+       (kIntegerKeysCount, "<int, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<std::string, int>>
       (new esr_test::InsertionRetrievalTest<std::string, int>
-       (16, "<string, int>")));
+       (kStringKeysCount, "<string, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<int, std::string>>
       (new esr_test::InsertionRetrievalTest<int, std::string>
-       (16, "<int, string>")));
+       (kIntegerKeysCount, "<int, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<std::string, std::string>>
       (new esr_test::InsertionRetrievalTest<std::string, std::string>
-       (16, "<string, string>")));
+       (kStringKeysCount, "<string, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<bool, int>>
-      (new esr_test::InsertionRetrievalTest<bool, int>(1, "<bool, int>")));
+      (new esr_test::InsertionRetrievalTest<bool, int>(2, "<bool, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<int, bool>>
-      (new esr_test::InsertionRetrievalTest<int, bool>(16, "<int, bool>")));
+      (new esr_test::InsertionRetrievalTest<int, bool>
+       (kIntegerKeysCount, "<int, bool>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<bool, std::string>>
       (new esr_test::InsertionRetrievalTest<bool, std::string>
-       (1, "<bool, string>")));
+       (2, "<bool, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<std::string, bool>>
       (new esr_test::InsertionRetrievalTest<std::string, bool>
-       (16, "<string, bool>")));
+       (kStringKeysCount, "<string, bool>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<bool, bool>>
@@ -343,88 +347,91 @@ int main() {
 ////////////////////////////////////////////////////////////////////////////////
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<int, int>>
-      (new esr_test::CopyAssignmentTest<int, int>(16, "<int, int>")));
+      (new esr_test::CopyAssignmentTest<int, int>
+       (kIntegerKeysCount, "<int, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<std::string, int>>
       (new esr_test::CopyAssignmentTest<std::string, int>
-       (16, "<string, int>")));
+       (kStringKeysCount, "<string, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<int, std::string>>
       (new esr_test::CopyAssignmentTest<int, std::string>
-       (16, "<int, string>")));
+       (kIntegerKeysCount, "<int, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<std::string, std::string>>
       (new esr_test::CopyAssignmentTest<std::string, std::string>
-       (16, "<string, string>")));
+       (kStringKeysCount, "<string, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<bool, int>>
-      (new esr_test::CopyAssignmentTest<bool, int>(1, "<bool, int>")));
+      (new esr_test::CopyAssignmentTest<bool, int>(2, "<bool, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<int, bool>>
-      (new esr_test::CopyAssignmentTest<int, bool>(16, "<int, bool>")));
+      (new esr_test::CopyAssignmentTest<int, bool>
+       (kIntegerKeysCount, "<int, bool>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<bool, std::string>>
       (new esr_test::CopyAssignmentTest<bool, std::string>
-       (1, "<bool, string>")));
+       (2, "<bool, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<std::string, bool>>
       (new esr_test::CopyAssignmentTest<std::string, bool>
-       (16, "<string, bool>")));
+       (kStringKeysCount, "<string, bool>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::CopyAssignmentTest<bool, bool>>
-      (new esr_test::CopyAssignmentTest<bool, bool>(1, "<bool, bool>")));
+      (new esr_test::CopyAssignmentTest<bool, bool>(2, "<bool, bool>")));
 
 ////////////////////////////////////////////////////////////////////////////////
 // Deletions
 ////////////////////////////////////////////////////////////////////////////////
   correctness_tests.push_back(
       shared_ptr<esr_test::DeletionTest<int, int>>
-      (new esr_test::DeletionTest<int, int>(16, "<int, int>")));
+      (new esr_test::DeletionTest<int, int>(kIntegerKeysCount, "<int, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<std::string, int>>
       (new esr_test::DeletionTest<std::string, int>
-       (16, "<string, int>")));
+       (kStringKeysCount, "<string, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<int, std::string>>
       (new esr_test::DeletionTest<int, std::string>
-       (16, "<int, string>")));
+       (kIntegerKeysCount, "<int, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::InsertionRetrievalTest<std::string, std::string>>
       (new esr_test::DeletionTest<std::string, std::string>
-       (16, "<string, string>")));
+       (kStringKeysCount, "<string, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::DeletionTest<bool, int>>
-      (new esr_test::DeletionTest<bool, int>(1, "<bool, int>")));
+      (new esr_test::DeletionTest<bool, int>(2, "<bool, int>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::DeletionTest<int, bool>>
-      (new esr_test::DeletionTest<int, bool>(16, "<int, bool>")));
+      (new esr_test::DeletionTest<int, bool>
+       (kIntegerKeysCount, "<int, bool>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::DeletionTest<bool, std::string>>
       (new esr_test::DeletionTest<bool, std::string>
-       (1, "<bool, string>")));
+       (2, "<bool, string>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::DeletionTest<std::string, bool>>
       (new esr_test::DeletionTest<std::string, bool>
-       (16, "<string, bool>")));
+       (kStringKeysCount, "<string, bool>")));
 
   correctness_tests.push_back(
       shared_ptr<esr_test::DeletionTest<bool, bool>>
-      (new esr_test::DeletionTest<bool, bool>(1, "<bool, bool>")));
+      (new esr_test::DeletionTest<bool, bool>(2, "<bool, bool>")));
 
   for (auto test : correctness_tests) {
     std::cout << test->name()
