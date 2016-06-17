@@ -52,7 +52,7 @@ n is a number of elements in List.
 ### Files
 #### Hash Table
 * esr/hashtable.hpp
-	Implementation of Hashtable.
+	> Implementation of Hashtable.
 * esr/hasher.hpp
 	Contins hash functions for some basic types.
 * esr/linkedlist.hpp
