@@ -86,7 +86,6 @@ class InsertionRetrievalTest : public CorrectnessTest {
   bool add_positive();
 
  private:
-
   bool add_positive_negative();
   bool get_by_pointer_positive();
   bool get_by_pointer_negative();
