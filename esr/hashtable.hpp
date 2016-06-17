@@ -74,13 +74,6 @@ class Hashtable {
 
   /// Forward iterator.
   class iterator {
-    // friend void swap(iterator& lhs, iterator& rhs); //C++11
-    // void swap(ForwardIterator& other) noexcept
-    // {
-    //    using std::swap;
-    //    swap(itr, other.iter);
-    //}
-
    public:
     /// @brief Creates Hashtable's iterator.
     /// @param owner is a Hashtable object, owner of the iterator.
