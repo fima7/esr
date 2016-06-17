@@ -7,7 +7,7 @@
 #include <ostream>
 
 #include <esr/hashtable.hpp>
-// https://en.wikipedia.org/wiki/List_of_cities_in_Germany_by_population
+
 const size_t kWordsInLineOfDataFile = 6;
 
 namespace ret {
@@ -36,6 +36,7 @@ struct city {
   }
 };
 
+// Custom key function
 struct hkey {
   std::string name;
   bool is_capital;
@@ -76,7 +77,7 @@ struct hkey {
 
 
 namespace esr {
-
+// Custom hash function
 template <>
 class hash_function<city::hkey> :
       public esr::hasher<city::hkey> {
@@ -114,7 +115,7 @@ class hash_function<city::hkey> :
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
-    std::cerr << "Usage " << argv[0] << " file\n";
+    std::cerr << "Usage " << argv[0] << " ./data/cities.data\n";
     return -ret::invalid_args;
   }
 
