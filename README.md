@@ -71,10 +71,7 @@ n is a number of elements in List.
 
 ### Performance evaluation
 #### Integer Keys
-| Input Size | HT ADD   | UM ADD     | HT FIND   | UM FIND   |
-| ---------- | ---------| ------- -- | --------- | --------- |
+| Input Size | dfsfs    | dfsf       | HT FIND   | UM FIND   |
+| ---------- | -------- | ---------- | --------- | --------- |
 |  2	     | 0.003000	| 0.003000   |  0.000500 |  0.000000 |	       	 
-|  4 	     | 0.000500	| 0.000500   |  0.000000 |  0.000250 |		
-|  8	     | 0.00025	| 0 0.000625 |  0.000125 |  0.000125 |		
-
 
