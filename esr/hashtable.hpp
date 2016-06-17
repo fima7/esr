@@ -2,19 +2,19 @@
 #ifndef ESR_HASHTABLE_FLYMAKE_HPP_
 #define ESR_HASHTABLE_FLYMAKE_HPP_
 
-#include <ostream>    // operator<<()
-#include <iomanip>    // operator<<()
-#include <cassert>    // assert()
-#include <algorithm>  // std::swap()
+#include <ostream>    // operator<<().
+#include <iomanip>    // operator<<().
+#include <cassert>    // assert().
+#include <algorithm>  // std::swap().
 
-#include <esr/hasher.hpp>      // basic hash functions
-#include <esr/linkedlist.hpp>  // list for buckets
-#include <esr/hashexcept.hpp>  // Hashtable's specific exceptions
+#include <esr/hasher.hpp>      // Basic hash functions.
+#include <esr/linkedlist.hpp>  // List for buckets.
+#include <esr/hashexcept.hpp>  // Hashtable's specific exceptions.
 
 namespace esr {
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @class Hashtable
+/// @class Hashtable.
 ///
 /// @brief Hashtable implementation.
 /// Data structure uses hashing with chaining to store data as
@@ -27,49 +27,49 @@ class Hashtable {
  public:
   class iterator;
 
-  /// Default constructor, creates Hashtable
+  /// Default constructor, creates Hashtable.
   explicit Hashtable(size_t load_factor_bound_low = m_LoadFactorBoundLowDefault,
                      size_t load_factor_bound_up = m_LoadFactorBoundUpDefault);
 
-  /// Copy constructor, creates copy of Hashtable
+  /// Copy constructor, creates copy of Hashtable.
   Hashtable(const Hashtable& other);
 
-  /// Destructor, deletes Hashtable
+  /// Destructor, deletes Hashtable.
   virtual ~Hashtable();
 
-  /// Assignment operator
+  /// Assignment operator.
   Hashtable& operator=(Hashtable other);
 
-  /// Adds key, value to hashtable
+  /// Adds key, value to hashtable.
   bool add(const K& key, const V& value);
 
-  /// Removes key from hashtable
+  /// Removes key from hashtable.
   void remove(const K& key);
 
-  /// Sets the value by key
+  /// Sets the value by key.
   bool set(const K& key, const V& value);
 
-  /// Gets constant pointer to value by key
+  /// Gets constant pointer to value by key.
   const V* get(const K& key) const;
 
-  /// Finds a value by key
+  /// Finds a value by key.
   iterator find(const K& key);
 
-  /// Gets a number of elements in hashtable
+  /// Gets a number of elements in hashtable.
   size_t size() const { return m_size; }
 
-  /// Gets average number of elements in bucket
+  /// Gets average number of elements in bucket.
   size_t load_factor() const {
     return (
         (m_bucket_count == 0) ?
         0 : (m_LoadFactor100Percents*m_size)/m_bucket_count);
   }
 
-  /// Hashtable's printer
+  /// Hashtable's printer.
   template <typename KK, typename VV>
   friend ostream & operator<<(ostream & os, const Hashtable<KK, VV> & ht);
 
-  /// Forward iterator
+  /// Forward iterator.
   class iterator {
     // friend void swap(iterator& lhs, iterator& rhs); //C++11
     // void swap(ForwardIterator& other) noexcept
@@ -79,7 +79,7 @@ class Hashtable {
     //}
 
    public:
-    /// Creates Hashtable's iterator
+    /// @brief Creates Hashtable's iterator.
     /// @param owner is a Hashtable object, owner of the iterator.
     /// @param current_bucket_idx is a number of the current bucket
     /// in bucket's array.
@@ -108,10 +108,12 @@ class Hashtable {
     bool operator==(const iterator& rhs);
 
    private:
-    /// Owner of the iterator
+    /// Owner of the iterator.
     Hashtable* m_owner;
+
     /// Number of the current bucket in the bucket array.
     size_t m_current_bucket_idx;
+
     /// Pointer to the current node in the current bucket.
     listnode<K, V>* m_current_bucket_node_ptr;
   };
@@ -145,16 +147,18 @@ class Hashtable {
   /// @param bucket_count is a size of resized bucket array.
   void resize(size_t bucket_count);
 
-  /// Load factor 100%
-  static const size_t m_LoadFactor100Percents = 100;  // size == buckets, 100%
+  /// Load factor 100%.
+  static const size_t m_LoadFactor100Percents = 100;  // size == buckets, 100%.
+
   /// Default value of load factor's low theshold (%).
   static const size_t m_LoadFactorBoundLowDefault = 49;
+
   /// Default value of load factor's upper theshold (%).
   static const size_t m_LoadFactorBoundUpDefault = 99;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-// Constants
+// Constants.
 ////////////////////////////////////////////////////////////////////////////////
 template <typename K, typename V>
 const size_t Hashtable<K, V>::m_LoadFactor100Percents;
@@ -164,7 +168,7 @@ template <typename K, typename V>
 const size_t Hashtable<K, V>::m_LoadFactorBoundLowDefault;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Constructors, Destructor and Assignments
+// Constructors, Destructor and Assignments.
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Default constructor for Hashtable.
@@ -174,7 +178,7 @@ const size_t Hashtable<K, V>::m_LoadFactorBoundLowDefault;
 /// @tparam V type of hash value.
 /// @param load_factor_bound_low is a load factor's low threshold.
 /// @param load_factor_bound_up is a load factor's upper threshold.
-/// @return nothing
+/// @return nothing.
 template <typename K, typename V>
 Hashtable<K, V>::Hashtable(size_t load_factor_bound_low,
                            size_t load_factor_bound_up) :
@@ -191,7 +195,7 @@ Hashtable<K, V>::Hashtable(size_t load_factor_bound_low,
 /// @tparam V type of hash value.
 /// @param other is an existing source Hashtable
 /// instance to be copied to target.
-/// @return nothing
+/// @return nothing.
 template <typename K, typename V>
 Hashtable<K, V>::Hashtable(const Hashtable& other) :
     m_size(other.m_size),
@@ -213,7 +217,7 @@ Hashtable<K, V>::Hashtable(const Hashtable& other) :
 /// @tparam V type of hash value.
 /// @param other is an existing source Hashtable
 /// instance to be copied to target.
-/// @return nothing
+/// @return nothing.
 template <typename K, typename V>
 Hashtable<K, V>& Hashtable<K, V>::operator=(Hashtable other) {
   std::swap(m_size, other.m_size);
@@ -230,14 +234,14 @@ Hashtable<K, V>& Hashtable<K, V>::operator=(Hashtable other) {
 /// deleting the bucket array.
 /// @tparam K type of hash key.
 /// @tparam V type of hash value.
-/// @return nothing
+/// @return nothing.
 template <typename K, typename V>
 Hashtable<K, V>::~Hashtable() {
   delete [] m_buckets;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Iterator
+// Iterator.
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Advances the iterator to the next element.
@@ -269,15 +273,15 @@ typename Hashtable<K, V>::iterator& Hashtable<K, V>::iterator::operator++() {
 
     if (next_not_empty_bucket_idx < m_owner->m_bucket_count) {
       // Next bucket less then bucket count:
-      //               set index to the found bucket
-      //               set pointer to the begining of bucket
+      //               set index to the found bucket,
+      //               set pointer to the begining of bucket.
       m_current_bucket_idx = next_not_empty_bucket_idx;
       linkedlist<K, V>& bucket = m_owner->m_buckets[m_current_bucket_idx];
       m_current_bucket_node_ptr = bucket.front();
     } else {
       // Next bucket equal or greater than bucket count
-      //               set index to the last bucket
-      //               set pointer to the end of last bucket
+      //               set index to the last bucket,
+      //               set pointer to the end of last bucket.
       m_current_bucket_idx = m_owner->m_bucket_count - 1;
       m_current_bucket_node_ptr = nullptr;
     }
@@ -376,10 +380,11 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::begin() {
       break;
   }
   assert(first_not_empty_bucket_idx <= m_bucket_count);
-  // Empty hashtable, return end() interator
+
+  // Empty hashtable, return end() interator.
   if (first_not_empty_bucket_idx == m_bucket_count)
     return iterator(this, m_bucket_count-1, nullptr);
-  // don't want to use "return end()", because of following line
+  // Don't want to use "return end()", because of following line.
 
   // Stands at first entry of hashtable
   return iterator(this, first_not_empty_bucket_idx, bucket->front());
@@ -398,17 +403,17 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::end() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Accessors and Modifiers
+// Accessors and Modifiers.
 ////////////////////////////////////////////////////////////////////////////////
 
-/// @brief Set value
+/// @brief Set value.
 /// Provides write access to Hashtable's element by it's key.
 /// @tparam K type of hash key.
 /// @tparam V type of hash value.
 /// @param key is a key of element.
 /// @param value is a value of element.
 /// @return result of setting a value.
-/// @retval true on success
+/// @retval true on success.
 /// @retval false if no element with such key found in Hashtable.
 /// @throw bucket_index exception if a bucket number returned
 /// by the hash funtion is out of the bucket array range.
@@ -486,7 +491,7 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Isertion, Deletion; private: Resize
+// Isertion, Deletion; private: Resize.
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Adds an element.
@@ -606,7 +611,7 @@ void Hashtable<K, V>::resize(size_t bucket_count) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Printout
+// Printout.
 ////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Prints to output stream.
