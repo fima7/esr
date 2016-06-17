@@ -62,8 +62,9 @@ n is a number of elements in List.
 * __likedlist_test.hpp__ : Runs functional correctness tests for Linked List.
 * __correctness_test.cpp__ : Runs a number of correctness tests for basic types.
 * __performance_test.cpp__ : Runs perfomance tests using integer and std::string keys for both Hashtable and std::unordered_map.
-* __cities.cpp__ : Illustrative application which uses Hashtable to process the real world data.
-* __tiny_test.cpp__ : Developers sandbox to make some quick tests.
+* __cities.cpp__ : Illustrative application which uses Hashtable to process the real world data
+* with custom key type.
+* __tiny_test.cpp__ : My sandbox to make some quick tests.
 
 ### Tests
 1. > make
