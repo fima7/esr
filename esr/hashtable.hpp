@@ -2,15 +2,14 @@
 #ifndef ESR_HASHTABLE_FLYMAKE_HPP_
 #define ESR_HASHTABLE_FLYMAKE_HPP_
 
-#include <ostream>
-#include <iomanip>
-#include <utility>
-#include <algorithm>
-#include <cassert>
+#include <ostream>    // operator<<()
+#include <iomanip>    // operator<<()
+#include <cassert>    // assert()
+#include <algorithm>  // std::swap()
 
-#include <esr/hasher.hpp>
-#include <esr/linkedlist.hpp>
-#include <esr/hashexcept.hpp>
+#include <esr/hasher.hpp>      // basic hash functions
+#include <esr/linkedlist.hpp>  // list for buckets
+#include <esr/hashexcept.hpp>  // Hashtable's specific exceptions
 
 namespace esr {
 
@@ -117,10 +116,10 @@ class Hashtable {
     listnode<K, V>* m_current_bucket_node_ptr;
   };
 
-  /// Gets begin of Hashtable.
+  /// Gets the beginning of Hashtable.
   iterator begin();
 
-  /// Gets end of Hashtable.
+  /// Gets the end of Hashtable.
   iterator end();
 
  private:
@@ -240,6 +239,18 @@ Hashtable<K, V>::~Hashtable() {
 ////////////////////////////////////////////////////////////////////////////////
 // Iterator
 ////////////////////////////////////////////////////////////////////////////////
+
+/// @brief Advances the iterator to the next element.
+/// Sets the current pointer to the next element of
+/// the current bucket if next element exists.
+/// Otherwise searches for the next not empty bucket in
+/// the bucket array. Sets the current bucket index to found
+/// bucket and current pointer to the beginning of found bucket.
+/// Sets current bucket index to the last bucket and current ponter
+/// to nullptr if Hashtable don't have empty buckets any more.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @return reference to iterator.
 template <typename K, typename V>
 typename Hashtable<K, V>::iterator& Hashtable<K, V>::iterator::operator++() {
   m_current_bucket_node_ptr = m_current_bucket_node_ptr->next();
@@ -258,15 +269,15 @@ typename Hashtable<K, V>::iterator& Hashtable<K, V>::iterator::operator++() {
 
     if (next_not_empty_bucket_idx < m_owner->m_bucket_count) {
       // Next bucket less then bucket count:
-      //               set index to found bucket
-      //               set pointer to begin of bucket
+      //               set index to the found bucket
+      //               set pointer to the begining of bucket
       m_current_bucket_idx = next_not_empty_bucket_idx;
       linkedlist<K, V>& bucket = m_owner->m_buckets[m_current_bucket_idx];
       m_current_bucket_node_ptr = bucket.front();
     } else {
       // Next bucket equal or greater than bucket count
-      //               set index to last bucket
-      //               set pointer to end of last bucket
+      //               set index to the last bucket
+      //               set pointer to the end of last bucket
       m_current_bucket_idx = m_owner->m_bucket_count - 1;
       m_current_bucket_node_ptr = nullptr;
     }
@@ -274,6 +285,13 @@ typename Hashtable<K, V>::iterator& Hashtable<K, V>::iterator::operator++() {
   return *this;
 }
 
+/// @brief Dereferenses an iterator.
+/// Provides access to Hashtable's element by it's reference.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @return reference to Hashtable's element.
+/// @throw end_iterator exception in attempt to dereferencing an
+/// end iterator.
 template <typename K, typename V>
 listnode<K, V>& Hashtable<K, V>::iterator::operator*() {
   // unlikely
@@ -285,6 +303,13 @@ listnode<K, V>& Hashtable<K, V>::iterator::operator*() {
   return *m_current_bucket_node_ptr;
 }
 
+/// @brief Dereferenses an iterator.
+/// Provides access to Hashtable's element by it's pointer.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @return pointer to Hashtable's element.
+/// @throw end_iterator exception in attempt to dereferencing an
+/// end iterator.
 template <typename K, typename V>
 listnode<K, V>* Hashtable<K, V>::iterator::operator->() {
   if (m_current_bucket_node_ptr == nullptr) {
@@ -295,18 +320,50 @@ listnode<K, V>* Hashtable<K, V>::iterator::operator->() {
   return m_current_bucket_node_ptr;
 }
 
+/// @brief Inequality comparison of iterators.
+/// Compare iterators by their current bucket indicies
+/// and their current element pointers.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param reference to iterator.
+/// Right-hand side of a comparison expression.
+/// @return result of the equality comparison.
+/// @retval true if current bucket indicies or
+/// current element pointers of both iterators are not equal.
+/// @retval false otherwise.
 template <typename K, typename V>
 bool Hashtable<K, V>::iterator::operator!=(const iterator& rhs) {
   return (m_current_bucket_idx != rhs.m_current_bucket_idx) ||
       (m_current_bucket_node_ptr != rhs.m_current_bucket_node_ptr);
 }
 
+/// @brief Equality comparison of iterators.
+/// Compare iterators by their current bucket indicies
+/// and their current element pointers.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// Right-hand side of a comparison expression.
+/// @return result of the equality comparison.
+/// @retval true if current bucket indicies and
+/// current element pointers of both iterators are equal.
+/// @retval false otherwise.
 template <typename K, typename V>
 bool Hashtable<K, V>::iterator::operator==(const iterator& rhs) {
   return (m_current_bucket_idx == rhs.m_current_bucket_idx) &&
       (m_current_bucket_node_ptr == rhs.m_current_bucket_node_ptr);
 }
 
+/// @brief Gets the beginning of Hashtable.
+/// Searches for the first not empty bucket in
+/// the bucket array. Sets bucket
+/// index to found bucket and element pointer to
+/// the first element of found bucket.
+/// Sets bucket index to the last bucket and
+/// element ponter to nullptr if all buckets are empty.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @return iterator containig bucket index
+/// and bucket pointer.
 template <typename K, typename V>
 typename Hashtable<K, V>::iterator Hashtable<K, V>::begin() {
   linkedlist<K, V>* bucket = nullptr;
@@ -322,15 +379,21 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::begin() {
   // Empty hashtable, return end() interator
   if (first_not_empty_bucket_idx == m_bucket_count)
     return iterator(this, m_bucket_count-1, nullptr);
-  // don't want to return end(), because of following line
+  // don't want to use "return end()", because of following line
 
   // Stands at first entry of hashtable
   return iterator(this, first_not_empty_bucket_idx, bucket->front());
 }
 
+/// @brief Gets the end of Hashtable.
+/// Sets bucket index to the last bucket and
+/// element ponter to nullptr.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @return iterator containig bucket index
+/// and bucket pointer.
 template <typename K, typename V>
 typename Hashtable<K, V>::iterator Hashtable<K, V>::end() {
-  // m_bucket_cout may be 0
   return iterator(this, m_bucket_count-1, nullptr);
 }
 
@@ -425,6 +488,7 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::find(const K& key) {
 ////////////////////////////////////////////////////////////////////////////////
 // Isertion, Deletion; private: Resize
 ////////////////////////////////////////////////////////////////////////////////
+
 /// @brief Adds an element.
 /// Inserts an element to Hashtable. Expands the bucket array to
 /// it's double size if load factor is grater than load factor's
@@ -544,6 +608,14 @@ void Hashtable<K, V>::resize(size_t bucket_count) {
 ////////////////////////////////////////////////////////////////////////////////
 // Printout
 ////////////////////////////////////////////////////////////////////////////////
+
+/// @brief Prints to output stream.
+/// Outputs the Hashtable's contents to output stream.
+/// @tparam K type of hash key.
+/// @tparam V type of hash value.
+/// @param os is an output stream.
+/// @param htable is an Hashtable instance.
+/// @return reference to output stream.
 template <typename K, typename V>
 ostream & operator<<(ostream & os, const Hashtable<K, V> & htable) {
   for (int i = 0; i < htable.m_bucket_count; ++i)
