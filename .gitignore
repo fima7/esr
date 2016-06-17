@@ -28,7 +28,10 @@
 *.out
 *.app
 cities
-hashtable
+correctness_test
+linkedlist_test
+performance_test
+tiny_test
 
 #Emacs
 *~
