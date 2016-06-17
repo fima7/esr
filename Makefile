@@ -26,5 +26,8 @@ cities: cities.cpp esr/hashtable.hpp esr/hasher.hpp esr/linkedlist.hpp
 submission: hashtable.cpp
 	$(CL) hashtable.cpp -o hashtable
 
+doc: cities.cpp performance_test.cpp esr/hashtest.hpp esr/hashtable.hpp esr/hasher.hpp esr/linkedlist.hpp
+	doxygen ./Doxyfile
+
 clean:
-	rm -f cities hashtable_test linkedlist_test tiny_test *.o 
+	rm -f cities hashtable_test linkedlist_test performance_test tiny_test *.o 
