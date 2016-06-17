@@ -2,9 +2,8 @@
 #ifndef ESR_HASHEXCEPT_FLYMAKE_HPP_
 #define ESR_HASHEXCEPT_FLYMAKE_HPP_
 
-#include <iostream>
-#include <stdexcept>
-#include <string>
+#include <stdexcept>  // std::out_of_range
+#include <string>     // std::string.
 
 #ifdef __GNUC__
 #define __ESR_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
@@ -17,82 +16,80 @@ namespace exception {
 
 using std::string;
 
+////////////////////////////////////////////////////////////////////////////////
+/// @class exception::hashtable.
+///
+/// @brief Hashtable exception.
+/// Common type for all Hashtable exceptions.
+////////////////////////////////////////////////////////////////////////////////
 class hashtable: public std::out_of_range {
  public:
+  /// @brief Default constructor, creates Hashtable exception.
+  /// @param who_arg is a data to identify function which throws an exception.
+  /// @param what_arg is a data describing the exception.
+  /// @return nothing.
   explicit hashtable(const string& who_arg = "",
                      const string& what_arg = "bad bucket index") :
       out_of_range(what_arg),
       m_who(who_arg) {}
+
+  /// @brief Gets exception thrower desription.
+  /// @return Description provided by function which throws the exception.
   const string& who() const { return m_who; }
  protected:
-  string m_who;
+  string m_who;  //< exception origin.
 };
 
+////////////////////////////////////////////////////////////////////////////////
+/// @class exception::bucket_index.
+///
+/// @brief Bucket index exception.
+/// Index is out of range of bucket array.
+////////////////////////////////////////////////////////////////////////////////
 class bucket_index: public hashtable {
  public:
+  /// @brief Default constructor, creates a bucket exception.
+  /// @param index is a value of bucket index.
+  /// @param who_arg is a data to identify function which throws an exception.
+  /// @param what_arg is a data describing the exception.
+  /// @return nothing.
   explicit bucket_index(int index, const string& who_arg = "",
     const string& what_arg = "bad bucket index") :
       hashtable(who_arg, what_arg), m_index(index) {}
-      size_t index() const { return m_index; }
+
+  /// @brief Gets an index of bucket array.
+  /// @return index of bucket array.
+  size_t index() const { return m_index; }
  private:
-     size_t m_index;
+  size_t m_index;  //< bucket index.
 };
 
+////////////////////////////////////////////////////////////////////////////////
+/// @class exception::end_iterator.
+///
+/// @brief End iterator exception.
+/// Attempt to dereference end iterator.
+////////////////////////////////////////////////////////////////////////////////
 class end_iterator: public hashtable {
  public:
+  /// @brief Default constructor, creates an end iterator exception.
+  /// @param index is a value of bucket index.
+  /// @param who_arg is a data to identify function which throws an exception.
+  /// @param what_arg is a data describing the exception.
+  /// @return nothing.
   explicit end_iterator(int index, const string& who_arg = "",
-    const string& what_arg = "dereferencing end iterator") :
+                        const string& what_arg = "dereferencing end iterator") :
       hashtable(who_arg, what_arg), m_index(index) {}
-      size_t current_bucket_index() const { return m_index; }
+
+  /// @brief Gets index of current bucket.
+  /// @return index of current bucket.
+  size_t current_bucket_index() const { return m_index; }
  private:
-     size_t m_index;
+     size_t m_index;  //< bucket index.
 };
 
+}  // namespace exception
 
-
-  
-  /*
-  class bucket_index: public hashtable {
- public:
-  explicit bucket_index(int index, const string& who_arg = "",
-    const string& what_arg = "bad bucket index") :
-      hashtable(who_arg, what_arg), m_index(index) {}
- private:
-  size_t m_index;
-};
-  */
-}
-
-}
-
-
-/*
-
-class bad_bucket_index: public std::out_of_range {
- public:
-  explicit bucket_index_error(int index,
-                              const string& where_arg = "",
-                              const string& what_arg = "bad bucket index") :
-      out_of_range(what_arg),
-      m_index(index),
-      m_where(where_arg) {}
- private:
-  int m_index;
-  string m_where;
-};
-
-class deref_end_iterator: public std::out_of_range {
- public:
-  explicit deref_end_iterator(int index,
-                              const string& where_arg = "",
-                              const string& what_arg = "bad bucket index") :
-      out_of_range(what_arg),
-      m_index(index),
-      m_where(where_arg) {}
- private:
-  int m_index;
-  string m_where;
-};
-*/
+}  // namespace esr
 
 #endif  // ESR_HASHEXCEPT_FLYMAKE_HPP_

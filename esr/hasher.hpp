@@ -8,7 +8,7 @@
 namespace esr {
 
 ////////////////////////////////////////////////////////////////////////////////
-/// @class Hasher.
+/// @class hasher.
 ///
 /// @brief Hash Function Interface.
 /// Maps key to index in bucket array.
@@ -39,6 +39,13 @@ class hasher {
   size_t m_cardinality;  ///< Size of bucket array.
 };
 
+////////////////////////////////////////////////////////////////////////////////
+/// @class hashfunction.
+///
+/// @brief Hash Function Implementation.
+/// Must be specialized for concrete type.
+/// @tparam K type of hash key.
+////////////////////////////////////////////////////////////////////////////////
 template<typename K>
 class hash_function : public hasher<K> {};
 
