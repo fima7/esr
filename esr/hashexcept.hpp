@@ -1,6 +1,9 @@
 // Copyright 2016
 #ifndef ESR_HASHEXCEPT_FLYMAKE_HPP_
 #define ESR_HASHEXCEPT_FLYMAKE_HPP_
+////////////////////////////////////////////////////////////////////////////////
+// Hashtable Exceptions.
+////////////////////////////////////////////////////////////////////////////////
 
 #include <stdexcept>  // std::out_of_range
 #include <string>     // std::string.
@@ -85,7 +88,7 @@ class end_iterator: public hashtable {
   /// @return index of current bucket.
   size_t current_bucket_index() const { return m_index; }
  private:
-     size_t m_index;  //< bucket index.
+  size_t m_index;  //< bucket index.
 };
 
 }  // namespace exception
