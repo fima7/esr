@@ -10,7 +10,7 @@ LinkedList&lt;K, V> class. LinkedList&lt;K, V> is an implementation of singly li
 list customized to store values with unique keys.
 
 ## Runing times
-_Provided for keys with fixed length._
+_Provided for keys and values of fixed length._
 
 ### Runtime of Hash Table
 n is a number of elements in Hashtable
@@ -74,7 +74,7 @@ with custom key type.
 ### Performance evaluation
 * _HT_ stands for Hash Table.
 * _UM_ stands for std::unordered_map.
-* _ADD()_ insertions operation.
+* _ADD()_ insertion operation.
 * _FIND()_ retrieval operation.
 First column contains a number of elements in Hash Table.
 Next four columns contain CPU time in miliseconds consumed by one
