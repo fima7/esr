@@ -275,13 +275,13 @@ bool CopyAssignmentTest<K, V>::copy_constructor() {
       return false;
     }
 
-    const K& r_key = found->key();
-    V& r_value = found->value();
+    const K& key = found->key();
+    V& value = found->value();
 
-    if (r_key != t.key() || r_value != t.value()) {
+    if (key != t.key() || value != t.value()) {
       std::cout << __ESR_PRETTY_FUNCTION__ << ' '
-                << "(key = " << r_key << ", "
-                << "value = " << r_value << ") "
+                << "(key = " << key << ", "
+                << "value = " << value << ") "
                 << "doesn't match expected "
                 << "(key = " << t.key() << ", "
                 << "value = " << t.value() << "). "
@@ -299,13 +299,13 @@ bool CopyAssignmentTest<K, V>::copy_constructor() {
       return false;
     }
 
-    const K& r_key = found->key();
-    V& r_value = found->value();
+    const K& key = found->key();
+    V& value = found->value();
 
-    if (r_key != t.key() || r_value != t.value()) {
+    if (key != t.key() || value != t.value()) {
       std::cout << __ESR_PRETTY_FUNCTION__ << ' '
-                << "(key = " << r_key << ", "
-                << "value = " << r_value << ") "
+                << "(key = " << key << ", "
+                << "value = " << value << ") "
                 << "doesn't match expected "
                 << "(key = " << t.key() << ", "
                 << "value = " << t.value() << "). "
@@ -330,13 +330,13 @@ bool CopyAssignmentTest<K, V>::copy_assignment() {
       return false;
     }
 
-    const K& r_key = found->key();
-    V& r_value = found->value();
+    const K& key = found->key();
+    V& value = found->value();
 
-    if (r_key != t.key() || r_value != t.value()) {
+    if (key != t.key() || value != t.value()) {
       std::cout << __ESR_PRETTY_FUNCTION__ << ' '
-                << "(key = " << r_key << ", "
-                << "value = " << r_value << ") "
+                << "(key = " << key << ", "
+                << "value = " << value << ") "
                 << "doesn't match expected "
                 << "(key = " << t.key() << ", "
                 << "value = " << t.value() << "). "
@@ -355,13 +355,13 @@ bool CopyAssignmentTest<K, V>::copy_assignment() {
       return false;
     }
 
-    const K& r_key = found->key();
-    V& r_value = found->value();
+    const K& key = found->key();
+    V& value = found->value();
 
-    if (r_key != t.key() || r_value != t.value()) {
+    if (key != t.key() || value != t.value()) {
       std::cout << __ESR_PRETTY_FUNCTION__ << ' '
-                << "(key = " << r_key << ", "
-                << "value = " << r_value << ") "
+                << "(key = " << key << ", "
+                << "value = " << value << ") "
                 << "doesn't match expected "
                 << "(key = " << t.key() << ", "
                 << "value = " << t.value() << "). "
