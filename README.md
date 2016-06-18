@@ -48,8 +48,26 @@ n is a number of elements in List.
 * linkedlist::empty() : O(1)
 * linkedlist::size() : O(1)
 
-### Code example
+### Example
+```
+#include <esr/hashtable.hpp>
 
+int main(int argc, char *argv[]) {
+  esr::Hashtable<std::string, std::string> phone_book;
+  phone_book.add("Fima", "01034900103");
+  phone_book.add("Chicha", "01070300103");
+  phone_book.add("Kit", "01070300777");
+
+  auto record = phone_book.find("Fima");
+  if (record != phone_book.end())
+    std::cout << record->key() << ", " << record->value()  << '\n';
+
+  for (auto& record : phone_book)
+    std::cout << record.key() << ", " << record.value()  << '\n';
+
+  return 0;
+}
+```
 ### Files
 #### Hash Table
 * esr/
@@ -67,10 +85,11 @@ n is a number of elements in List.
 with custom key type.
 * __tiny_test.cpp__ : My sandbox to make some quick tests.
 
-### Tests
-1. > make
-2. > testall
-
+### Compile and Run 
+```
+make
+testall
+```
 ### Performance evaluation
 * _HT_ stands for Hash Table.
 * _UM_ stands for std::unordered_map.
@@ -136,4 +155,3 @@ operation.
 | 10240      | 0.041167 |0.003666    |0.014515 	 |0.002303   |
 | 20480      | 0.083014 |0.007015    |0.028690 	 |0.004283   |
 | 40960      | 0.169421 |0.013148    |0.058229 	 |0.008421   |
-
