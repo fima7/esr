@@ -88,7 +88,7 @@ with custom key type.
 ### Compile and Run 
 ```
 make
-testall
+./testall
 ```
 ### Performance evaluation
 * _HT_ stands for Hash Table.
