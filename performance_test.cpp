@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Variable Length String Keys\n";
 
   n = 2;
-  for (int i = 0; i < 12; ++i) {
+  for (int i = 0; i < 10; ++i) {
     n = keys.size();
 
     auto* table = new  esr::Hashtable<std::string, int>();
