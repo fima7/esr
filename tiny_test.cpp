@@ -10,6 +10,22 @@ int main(int argc, char *argv[]) {
   esr::Hashtable<int, int> table;
   // esr::Hashtable<int, int>::iterator ee = table.end();
   // *ee;
+
+
+  esr::Hashtable<std::string, std::string> phone_book;
+  phone_book.add("Fima", "01034900103");
+  phone_book.add("Chicha", "01070300103");
+  phone_book.add("Kit", "01070300777");
+
+  auto record = phone_book.find("Fima");
+  if (record != phone_book.end())
+    std::cout << record->key() << ", " << record->value()  << '\n';
+
+  for (auto& record : phone_book)
+    std::cout << record.key() << ", " << record.value()  << '\n';
+
+
+  
   try {
     table.add(5, 8);
     table.add(7, 8);
