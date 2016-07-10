@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <limits>
 #include <esr/hashtable.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -21,6 +22,19 @@ void insertion_to_unordered_map(std::unordered_map<int, int>* map,
   for (int i = 0; i < number_of_entries; ++i)
     map->insert(std::make_pair(i, i));
 }
+
+void insertion_to_Hashtable(esr::Hashtable<uint64_t, int>* table,
+                            size_t number_of_entries) {
+  for (int i = 1; i < number_of_entries; i *= 2)
+    table->add(i, i);
+}
+
+void insertion_to_unordered_map(std::unordered_map<uint64_t, int>* map,
+                                size_t number_of_entries) {
+  for (int i = 1; i < number_of_entries; i *= 2)
+    map->insert(std::make_pair(i, i));
+}
+
 
 void retrieval_from_Hashtable(esr::Hashtable<int, int>* table,
                               size_t number_of_entries) {
@@ -39,6 +53,25 @@ void retrieval_from_unordered_map(std::unordered_map<int, int>* map,
       std::cerr << "fail\n";
   }
 }
+
+void retrieval_from_Hashtable(esr::Hashtable<uint64_t, int>* table,
+                            size_t number_of_entries) {
+  for (int i = 1; i < number_of_entries; i *= 2) {
+    auto found = table->find(i);
+    if (found == table->end())
+      std::cerr << "fail\n";
+  }
+}
+
+void retrieval_from_unordered_map(std::unordered_map<uint64_t, int>* map,
+                                size_t number_of_entries) {
+  for (int i = 1; i < number_of_entries; i *= 2) {
+    auto found = map->find(i);
+    if (found == map->end())
+      std::cerr << "fail\n";
+  }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // String Keys Iserions and Retrievals
@@ -87,7 +120,8 @@ class stopwatch {
   void start() { m_start = clock(); }
   void stop() { m_stop = clock(); }
   double time() {  // milliseconds
-    return (m_stop - m_start)/static_cast<double>(CLOCKS_PER_SEC)*1000;
+    double dt = (m_stop - m_start);
+    return (1000000.0*dt)/static_cast<double>(CLOCKS_PER_SEC);
   }
  private:
   clock_t m_start;
@@ -96,13 +130,67 @@ class stopwatch {
 
 }  // namespace esr
 
+void amorized_estimation(esr::stopwatch* stopwatch) {
+  esr::Hashtable<int, int>* table = new  esr::Hashtable<int, int>();
+  std::unordered_map<int, int>* map = new std::unordered_map<int, int>();
+  for (int i = 0; i < 65536; ++i) {
+    std::cout << i << ' ';
+    stopwatch->start();
+    table->add(i, i);
+    stopwatch->stop();
+    std::cout << std::fixed << stopwatch->time() << '\n';
+    /*
+    stopwatch->start();
+    map->insert(std::make_pair(i, i));
+    stopwatch->stop();
+    std::cout << std::setw(8) << std::fixed << stopwatch->time() << '\n';
+    */
+  }
+}
+
 int main(int argc, char *argv[]) {
   esr::stopwatch stopwatch;
 
-  int n = 2;
+  uint64_t n;  // = 2;
+  /*
+  std::cout << "Amortized data\n";
+  amorized_estimation(&stopwatch);
 
+  std::cout << "Unsigned Integer 64 bits Keys\n";
+  n = std::numeric_limits<uint64_t>::max() / 2;
+  esr::Hashtable<uint64_t, int>* utable = new  esr::Hashtable<uint64_t, int>();
+  std::unordered_map<uint64_t, int>* umap =
+      new std::unordered_map<uint64_t, int>();
+
+  // Insertion
+  stopwatch.start();
+  insertion_to_Hashtable(utable, n);
+  stopwatch.stop();
+  std::cout << std::setw(8) << std::fixed <<stopwatch.time()/n << ' ';
+
+  stopwatch.start();
+  insertion_to_unordered_map(umap, n);
+  stopwatch.stop();
+  std::cout << std::setw(8) << std::fixed << stopwatch.time()/n << ' ';
+
+  // std::cout << *utable << '\n' << std::flush;
+
+  // Retrieval
+  stopwatch.start();
+  retrieval_from_Hashtable(utable, n);
+  stopwatch.stop();
+  std::cout << std::setw(8) << stopwatch.time()/n << ' ';
+
+  stopwatch.start();
+  retrieval_from_unordered_map(umap, n);
+  stopwatch.stop();
+  std::cout << std::setw(8) << stopwatch.time()/n << ' ';
+
+  std::cout << '\n' << std::flush;
+  */
+  n = 2;
   std::cout << "Integer Keys\n";
-  for (int i = 0; i < 20; ++i, n += n) {
+  for (int i = 0; i < 23; ++i, n += n) {
     esr::Hashtable<int, int>* table = new  esr::Hashtable<int, int>();
     std::unordered_map<int, int>* map = new std::unordered_map<int, int>();
 
@@ -118,6 +206,8 @@ int main(int argc, char *argv[]) {
     insertion_to_unordered_map(map, n);
     stopwatch.stop();
     std::cout << std::setw(8) << std::fixed << stopwatch.time()/n << ' ';
+
+    // std::cout << *table << '\n' << std::flush;
 
     // Retrieval
     stopwatch.start();
@@ -151,6 +241,7 @@ int main(int argc, char *argv[]) {
   }
   file.close();
   n = 2;
+  int input_size = 10000;
   for (int i = 0; i < 25 ; ++i, n += n) {
     if (n > keys.size())
       break;
@@ -162,25 +253,29 @@ int main(int argc, char *argv[]) {
 
     // Insertion
     stopwatch.start();
-    insertion_to_Hashtable(table, keys, n);
+    insertion_to_Hashtable(table, keys, input_size);
     stopwatch.stop();
-    std::cout << std::setw(8) << std::fixed << stopwatch.time()/n << ' ';
+    std::cout << std::setw(8) << std::fixed
+              << stopwatch.time()/input_size << ' ';
 
     stopwatch.start();
-    insertion_to_unordered_map(map, keys, n);
+    insertion_to_unordered_map(map, keys, input_size);
     stopwatch.stop();
-    std::cout << std::setw(8) << std::fixed << stopwatch.time()/n << ' ';
+    std::cout << std::setw(8) << std::fixed
+              << stopwatch.time()/input_size << ' ';
 
     // Retrieval
     stopwatch.start();
-    retrieval_from_Hashtable(table, keys, n);
+    retrieval_from_Hashtable(table, keys, input_size);
     stopwatch.stop();
-    std::cout << std::setw(8) << stopwatch.time()/n << ' ';
+    std::cout << std::setw(8)
+              << stopwatch.time()/input_size << ' ';
 
     stopwatch.start();
-    retrieval_from_unordered_map(map, keys, n);
+    retrieval_from_unordered_map(map, keys, input_size);
     stopwatch.stop();
-    std::cout << std::setw(8) << stopwatch.time()/n << ' ';
+    std::cout << std::setw(8)
+              << stopwatch.time()/input_size << ' ';
 
     delete map;
     delete table;
@@ -189,7 +284,7 @@ int main(int argc, char *argv[]) {
   }
 
   std::cout << "Variable Length String Keys\n";
-
+  input_size = 10000;
   n = 2;
   for (int i = 0; i < 10; ++i) {
     n = keys.size();
@@ -202,25 +297,27 @@ int main(int argc, char *argv[]) {
 
     // Insertion
     stopwatch.start();
-    insertion_to_Hashtable(table, keys, n);
+    insertion_to_Hashtable(table, keys, input_size);
     stopwatch.stop();
-    std::cout << std::setw(8) << std::fixed << stopwatch.time()/n << ' ';
+    std::cout << std::setw(8) << std::fixed
+              << stopwatch.time()/input_size << ' ';
 
     stopwatch.start();
-    insertion_to_unordered_map(map, keys, n);
+    insertion_to_unordered_map(map, keys, input_size);
     stopwatch.stop();
-    std::cout << std::setw(8) << std::fixed << stopwatch.time()/n << ' ';
+    std::cout << std::setw(8) << std::fixed
+              << stopwatch.time()/input_size << ' ';
 
     // Retrieval
     stopwatch.start();
-    retrieval_from_Hashtable(table, keys, n);
+    retrieval_from_Hashtable(table, keys, input_size);
     stopwatch.stop();
-    std::cout << std::setw(8) << stopwatch.time()/n << ' ';
+    std::cout << std::setw(8) << stopwatch.time()/input_size << ' ';
 
     stopwatch.start();
-    retrieval_from_unordered_map(map, keys, n);
+    retrieval_from_unordered_map(map, keys, input_size);
     stopwatch.stop();
-    std::cout << std::setw(8) << stopwatch.time()/n << ' ';
+    std::cout << std::setw(8) << stopwatch.time()/input_size << ' ';
 
     delete map;
     delete table;
