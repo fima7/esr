@@ -2,12 +2,26 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <limits>
 
 #include <esr/hashtable.hpp>
 #include <esr/hashexcept.hpp>
 
+
 int main(int argc, char *argv[]) {
   esr::Hashtable<int, int> table;
+  for (int i = 1; i <= std::numeric_limits<int>::max()/2; i *= 2)
+    table.add(i, i);
+
+  esr::Hashtable<uint64_t, int> utable;
+  for (int i = 1; i <= std::numeric_limits<uint64_t>::max()/2; i *= 2)
+    utable.add(i, i);
+
+  std::cout << table << "\n";
+  std::cout << utable << "\n";
+
+  return 0;
+
   // esr::Hashtable<int, int>::iterator ee = table.end();
   // *ee;
 
@@ -25,7 +39,6 @@ int main(int argc, char *argv[]) {
     std::cout << record.key() << ", " << record.value()  << '\n';
 
 
-  
   try {
     table.add(5, 8);
     table.add(7, 8);
