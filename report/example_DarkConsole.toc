@@ -1,0 +1,5 @@
+\beamer@endinputifotherversion {3.36pt}
+\beamer@sectionintoc {1}{Statement.}{3}{0}{1}
+\beamer@sectionintoc {2}{Structure.}{8}{0}{2}
+\beamer@sectionintoc {3}{Implementation.}{17}{0}{3}
+\beamer@sectionintoc {4}{Runtime Analysis.}{37}{0}{4}
