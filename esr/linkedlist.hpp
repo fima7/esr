@@ -217,17 +217,14 @@ bool linkedlist<K, V>::erase(const K& key) {
         m_front = node->m_next;
         if (node == m_back)
           m_back = nullptr;
-        delete node;
-        m_size--;
-        return true;
-      } else {
+     } else {
         prev->m_next = node->m_next;
         if (node == m_back)
           m_back = prev;
-        delete node;
-        m_size--;
-        return true;
       }
+      delete node;
+      m_size--;
+      return true;
     }
     prev = node;
   }
