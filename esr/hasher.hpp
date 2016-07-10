@@ -56,7 +56,32 @@ class hash_function : public hasher<K> {};
 ////////////////////////////////////////////////////////////////////////////////
 // Hash functions for a few basic types int, char, bool and std::string.
 ////////////////////////////////////////////////////////////////////////////////
-
+#if 0
+template <>
+class hash_function<uint64_t> : public hasher<uint64_t> {
+ public:
+  explicit hash_function(int cardinality = 1) : hasher<uint64_t>(cardinality) {}
+  uint64_t code(const uint64_t& key) const { return key; }
+};
+#else
+template <>
+class hash_function<uint64_t> : public hasher<uint64_t> {
+ public:
+  uint64_t m_prime;
+  uint64_t m_a;
+  uint64_t m_b;
+  explicit hash_function(int cardinality = 1, uint64_t prime = 10000019) :
+      hasher<uint64_t>(cardinality),
+      m_prime(prime) {
+    std::srand(std::time(0));
+    m_a = std::rand() %  (m_prime - 1) + 1;  // 1 <= a <= p - 1
+    m_b = std::rand() %  (m_prime - 1);      // 1 <= b <= p - 1
+  }
+  uint64_t code(const uint64_t& key) const {
+    return (m_a*key + m_b) % m_prime;
+  }
+};
+#endif
 // integer hash function
 #if 1  // in use
 /// @brief Simple hash function for integer type.
