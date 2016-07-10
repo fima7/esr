@@ -370,10 +370,9 @@ typename Hashtable<K, V>::iterator Hashtable<K, V>::begin() {
   size_t first_not_empty_bucket_idx = 0;
   while (first_not_empty_bucket_idx < m_bucket_count) {
     bucket = &m_buckets[first_not_empty_bucket_idx];
-    if (bucket->empty())
-      ++first_not_empty_bucket_idx;
-    else
+    if (!bucket->empty())
       break;
+    ++first_not_empty_bucket_idx;
   }
   assert(first_not_empty_bucket_idx <= m_bucket_count);
 
@@ -417,7 +416,7 @@ template <typename K, typename V>
 bool Hashtable<K, V>::set(const K& key, const V& value) {
   if (m_size == 0) {
     assert(((m_buckets == nullptr) &&  (m_bucket_count == 0)));
-    return false;  // end() iterator
+    return false;
   }
 
   size_t bucket_idx = hash(key);
@@ -445,7 +444,7 @@ template <typename K, typename V>
 const V* Hashtable<K, V>::get(const K& key) const {
   if (m_size == 0) {
     assert(((m_buckets == nullptr) &&  (m_bucket_count == 0)));
-    return nullptr;  // end() iterator
+    return nullptr;
   }
 
   size_t bucket_idx = hash(key);
@@ -552,12 +551,13 @@ void Hashtable<K, V>::remove(const K& key) {
 
   --m_size;
 
-  // shrink
-  size_t factor = load_factor();
-  if (factor == 0) {
+  if (m_size == 0) {
     resize(0);
     return;
   }
+
+  // shrink
+  size_t factor = load_factor();
   if (factor < m_load_factor_bound_low) {  // unlikely
     size_t shrunk_bucket_count = m_bucket_count/2;
     resize(shrunk_bucket_count);
@@ -583,6 +583,7 @@ void Hashtable<K, V>::resize(size_t bucket_count) {
   if (bucket_count != 0) {
     std::unique_ptr<linkedlist<K, V>[]> ptr(new linkedlist<K, V>[bucket_count]);
     table = ptr.get();
+    //  std::cout << "New hash function: " << bucket_count << "\n";
     hash = hash_function<K>(bucket_count);  // new hash function from family
 
     // Rehash: adds every entry of table to new one
@@ -598,9 +599,10 @@ void Hashtable<K, V>::resize(size_t bucket_count) {
       }
     }
     ptr.release();
-    if (m_buckets != nullptr)
-      delete [] m_buckets;
   }
+  if (m_buckets != nullptr)
+      delete [] m_buckets;
+
   m_size = size;
   m_bucket_count = bucket_count;
   m_buckets = table;
