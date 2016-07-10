@@ -26,7 +26,7 @@ class hashtable: public std::out_of_range {
   /// @param what_arg is a data describing the exception.
   /// @return nothing.
   explicit hashtable(const string& who_arg = "",
-                     const string& what_arg = "bad bucket index") :
+                     const string& what_arg = "unknown") :
       out_of_range(what_arg),
       m_who(who_arg) {}
 
@@ -50,7 +50,7 @@ class bucket_index: public hashtable {
   /// @param who_arg is a data to identify function which throws an exception.
   /// @param what_arg is a data describing the exception.
   /// @return nothing.
-  explicit bucket_index(int index, const string& who_arg = "",
+  explicit bucket_index(const size_t index, const string& who_arg = "",
     const string& what_arg = "bad bucket index") :
       hashtable(who_arg, what_arg), m_index(index) {}
 
@@ -74,7 +74,7 @@ class end_iterator: public hashtable {
   /// @param who_arg is a data to identify function which throws an exception.
   /// @param what_arg is a data describing the exception.
   /// @return nothing.
-  explicit end_iterator(int index, const string& who_arg = "",
+  explicit end_iterator(const size_t index, const string& who_arg = "",
                         const string& what_arg = "dereferencing end iterator") :
       hashtable(who_arg, what_arg), m_index(index) {}
 
