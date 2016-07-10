@@ -36,7 +36,7 @@ struct city {
   }
 };
 
-// Custom key function
+// Custom key.
 struct hkey {
   std::string name;
   bool is_capital;
