@@ -238,7 +238,7 @@
 \begin{frame}[allowframebreaks]{Implementation.}{Insertion.}
   \IncMargin{1em}
   \resizebox{!}{43mm}{\begin{algorithm}[H]
-      \caption{add(key, value)}
+      \caption{\href{http://fima/esr/classesr\_1\_1\_hashtable.html\#af8210e61dbd1a633337bc95bbedf0f8e}{add(key, value)}}
       \SetFuncSty{textsc}
       \SetDataSty{emph}
       %%\newcommand{\expr}[1]{$\langle${#1}$\rangle$}
@@ -291,7 +291,8 @@
   \end{algorithm}}
   \framebreak
  \resizebox{!}{43mm}{\begin{algorithm}[H]
-      \caption{AddElementToBucket(key, value)}
+     \caption{\href{http://fima/esr/classesr\_1\_1linkedlist.html\#ae8c7b6f0cf9b82c77c12246ad0023078}
+       {AddElementToBucket(key, value)}}
       \SetFuncSty{textsc}
       \SetDataSty{emph}
       \SetCommentSty{commentsty}
@@ -333,7 +334,8 @@
 \begin{frame}[allowframebreaks]{Implementation.}{Deletion.}
   \IncMargin{1em}
   \resizebox{!}{43mm}{\begin{algorithm}[H]
-      \caption{remove(key)}
+      \caption{\href{http://fima/esr/classesr\_1\_1\_hashtable.html\#afdf16cd1fa1af9b008c39564a4590054}
+        {remove(key)}}
       \SetFuncSty{textsc}
       \SetDataSty{emph}
       \SetCommentSty{commentsty}
@@ -393,7 +395,8 @@
   \framebreak
 
   \resizebox{!}{43mm}{\begin{algorithm}[H]
-      \caption{RemoveElementFromBucket(key)}
+      \caption{\href{http://fima/esr/classesr\_1\_1linkedlist.html\#af67945ba61bad2c993e9c749d77bdb61}
+        {RemoveElementFromBucket(key)}}
       \SetFuncSty{textsc}
       \SetDataSty{emph}
       \SetCommentSty{commentsty}
@@ -440,7 +443,8 @@
 \begin{frame}{Implementation.}{Resizing.}
   \IncMargin{1em}
   \resizebox{!}{43mm}{\begin{algorithm}[H]
-      \caption{resize(newBucketsCount)}
+      \caption{\href{http://fima/esr/classesr\_1\_1\_hashtable.html\#aa02a8639c49e951680e974a0bb6b3b38}
+        {resize(newBucketsCount)}}
       \SetFuncSty{textsc}
       \SetDataSty{emph}
       \SetCommentSty{commentsty}
@@ -682,13 +686,21 @@
 
 \begin{frame}{Tests.}
   \begin{enumerate}
-  \item Correctnes tests.
+  \item Linked List Correctness tests.
+    \begin{enumerate}
+    \item Access.
+    \item Copy and Assignments.
+    \item Deletion.
+    \item Fake object.
+    \end{enumerate}
+
+  \item Hash Table Correctness tests.
     \begin{enumerate}
     \item Insertions and Retrievals.
     \item Copy and Assignments.
     \item Deletion.
     \end{enumerate}
-  \item Performance tests.
+  \item Hash Table Performance tests.
     \begin{enumerate}
     \item Integer Keys Isertions and Retrievals.
     \item Fixed Length String Keys Isertions and Retrievals.
@@ -698,7 +710,7 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Tests.}{Correctness.}
+\begin{frame}{Tests.}{Hash Table Correctness.}
   Tests functional correctness of Hashtable<K, V> for combinations of
   key type and value type, \textit{int, bool, std::string}. 
   \begin{enumerate}
@@ -720,7 +732,7 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Tests.}{Performance.}
+\begin{frame}{Tests.}{Hash Table Performance.}
   Tests performance of Hashtable<K, V> for \textit{int} and \textit{std::string}
   key types with \textit{int} value type.
   \begin{enumerate}
@@ -732,26 +744,26 @@
 
 
 
-\begin{frame}{Tests.}{Performance. Integers.}
+\begin{frame}{Tests.}{Hash Table Performance. Integers.}
   \begin{figure}
     \includegraphics[scale=0.3]{pictures/int_perf}
   \end{figure}
 \end{frame}
 
-\begin{frame}{Tests.}{Performance. Fixed Length Strings.}
+\begin{frame}{Tests.}{Hash Table Performance. Fixed Length Strings.}
   \begin{figure}
     \includegraphics[scale=0.3]{pictures/fstr_perf}
   \end{figure}
 \end{frame}
 
-\begin{frame}{Tests.}{Performance. Variable Length Strings.}
+\begin{frame}{Tests.}{Hash Table Performance. Variable Length Strings.}
   \begin{figure}
     \includegraphics[scale=0.3]{pictures/vstr_perf}
   \end{figure}
 \end{frame}
 
 
-\begin{frame}{Tests.}{Performance. Summary.}
+\begin{frame}{Tests.}{Hash Table Performance. Summary.}
   \begin{table}[]
     \caption{Comparison of esr::Hashtable\footnote{ HT stands for esr::Hashtable.}
       and std::unordered\_map\footnote{ UM stands for std::unordered\_map.}. }
