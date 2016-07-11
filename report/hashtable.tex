@@ -27,6 +27,8 @@
 \lstset{numbers=left, numbersep=1pt, xleftmargin=0.8em,frame=none,framexleftmargin=1em}
 \usepackage{booktabs}
 \usepackage{multirow}
+%\usepackage{verbatim}
+%\usepackage{minted}
 
 
 \graphicspath{ {./} }
@@ -1044,6 +1046,40 @@ SIZE               & O(1)           & O(1)               \\ \bottomrule
   \item Source Code.
   \item 15-minutes talk material.
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Appendix A.}{Memory Leakage}
+  \texttt{\tiny{\\
+    valgrind --leak-check=yes ./correctness\_test\\
+    ==22427== Memcheck, a memory error detector \\
+    ==22427== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.\\
+    ==22427== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info\\
+    ==22427== Command: ./correctness\_test\\
+    ==22427== \\
+    ==22427== \\
+    ==22427== HEAP SUMMARY:\\
+    ==22427==     in use at exit: 72,704 bytes in 1 blocks\\
+    ==22427==   total heap usage: 38,886,102 allocs, 38,886,101 frees, 1,287,985,849 bytes allocated\\
+    ==22427== \\
+    ==22427== LEAK SUMMARY:\\
+    ==22427==    definitely lost: 0 bytes in 0 blocks\\
+    ==22427==    indirectly lost: 0 bytes in 0 blocks\\
+    ==22427==      possibly lost: 0 bytes in 0 blocks\\
+    ==22427==    still reachable: 72,704 bytes in 1 blocks\\
+    ==22427==         suppressed: 0 bytes in 0 blocks\\
+    ==22427== Reachable blocks (those to which a pointer was found) are not shown.\\
+    ==22427== To see them, rerun with: --leak-check=full --show-leak-kinds=all\\
+    ==22427== \\
+    ==22427== For counts of detected and suppressed errors, rerun with: -v\\
+    ==22427== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)\\
+  }}
+
+  %\begin{minted}{bash}
+  %  valgrind --leak-check=yes ./correctness\_test
+  %\end{minted}
+  %\begin{lstlisting}[language=bash]
+  %  valgrind --leak-check=yes ./cities data/cities.data
+  %\end{lstlisting}
 \end{frame}
 
 
