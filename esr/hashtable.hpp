@@ -583,9 +583,7 @@ void Hashtable<K, V>::resize(size_t bucket_count) {
   if (bucket_count != 0) {
     std::unique_ptr<linkedlist<K, V>[]> ptr(new linkedlist<K, V>[bucket_count]);
     table = ptr.get();
-    //  std::cout << "New hash function: " << bucket_count << "\n";
     hash = hash_function<K>(bucket_count);  // new hash function from family
-
     // Rehash: adds every entry of table to new one
     for (int i = 0; i < m_bucket_count; ++i) {
       linkedlist<K, V>& bucket = m_buckets[i];
