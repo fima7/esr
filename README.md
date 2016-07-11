@@ -26,14 +26,14 @@ n is a number of elements in Hashtable
 * Hashtable::size() : O(1)
 * Hashtable::load_factor() : O(1)
 * Hashtable::iterator() consrtructor : O(1)
-* Hashtable::iterator++() : O(n)
+* Hashtable::iterator++() : worst O(n), amortized O(1)
 * Hashtable::iterator*() : O(1)
 * Hashtable::iterator->() : O(1)
 * Hashtable::iterator!=() : O(1)
 * Hashtable::iterator==() : O(1)
 * Hashtable::begin() : worst O(n), amortized O(1)
 * Hashtable::end() : O(1)
-* Hashtable::resize(size_t bucket_count) : O(n)
+* Hashtable::resize(size_t bucket_count) : worst O(n), amortized O(1)
 
 ### Runtime of Linked List
 n is a number of elements in List.
