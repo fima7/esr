@@ -519,7 +519,7 @@ bool Hashtable<K, V>::add(const K& key, const V& value) {
     throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
 
   linkedlist<K, V>& bucket = m_buckets[bucket_idx];
-  bool success = bucket.push_back(key, value);
+  bool success = bucket.push_front(key, value);
   m_size += success ? 1 : 0;
 
   return success;
@@ -593,7 +593,7 @@ void Hashtable<K, V>::resize(size_t bucket_count) {
         size_t bucket_idx =  hash(node->key());
         if (bucket_idx >= bucket_count)
           throw exception::bucket_index(bucket_idx, __ESR_PRETTY_FUNCTION__);
-        bool success = table[bucket_idx].push_back(node->key(), node->value());
+        bool success = table[bucket_idx].push_front(node->key(), node->value());
         assert(success);
         ++size;
       }

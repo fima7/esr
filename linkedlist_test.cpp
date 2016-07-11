@@ -31,7 +31,7 @@ bool linkedlist_access_test(size_t size, bool verbose) {
 
   // Add
   for (key = 0, value = size - 1; key < size; ++key, --value)
-    ll.push_back(key, value);
+    ll.push_front(key, value);
 
   if (verbose) {
     std::cout << "\nlist<int, int> = { " << ll << "}\n" << std::flush;
@@ -72,7 +72,7 @@ bool linkedlist_access_test(size_t size, bool verbose) {
     fake_value fvalue;
     fkey.m_data = key;
     fvalue.m_data = value;
-    fake_list.push_back(fkey, fvalue);
+    fake_list.push_front(fkey, fvalue);
 
     ++key, --value;
   }
@@ -174,7 +174,7 @@ bool linkedlist_copy_test(size_t size, bool verbose) {
 
   // Add
   for (key = 0, value = size - 1; key < size; ++key, --value)
-    ll_src.push_back(key, value);
+    ll_src.push_front(key, value);
 
   if (verbose) {
     std::cout << "\nsource list<int, int> = { "
@@ -241,7 +241,7 @@ bool linkedlist_assignment_test(size_t size, bool verbose) {
 
   // Add
   for (key = 0, value = size - 1; key < size; ++key, --value)
-    ll_src.push_back(key, value);
+    ll_src.push_front(key, value);
 
   if (verbose) {
     std::cout << "\nsource list<int, int> = { "
@@ -311,7 +311,7 @@ bool linkedlist_deletion_test(size_t size, bool verbose) {
 
   // Add
   for (key = 0, value = size - 1; key < size; ++key, --value)
-    ll_expect.push_back(key, value);
+    ll_expect.push_front(key, value);
 
   if (verbose) {
     std::cout << "\nlist<int, int> = { " << ll_expect << "}\n" << std::flush;

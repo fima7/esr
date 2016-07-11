@@ -92,7 +92,7 @@ class linkedlist {
   linkedlist& operator=(linkedlist other);
 
   /// Adds element to List.
-  bool push_back(const K& key, const V& value);
+  bool push_front(const K& key, const V& value);
 
   /// Gets immutable element from List by it's key.
   const listnode<K, V>* find(const K& key) const;
@@ -119,7 +119,6 @@ class linkedlist {
  private:
   size_t m_size;            //< Number of elements of Linked List.
   listnode<K, V> *m_front;  //< First element of Linked List.
-  listnode<K, V> *m_back;   //< Last element of Linked List.
   void clear();
 };
 
@@ -132,7 +131,7 @@ class linkedlist {
 /// @tparam K type of key.
 /// @tparam V type of value.
 template <typename K, typename V>
-linkedlist<K, V>::linkedlist() : m_size(0), m_front(nullptr), m_back(nullptr) {}
+linkedlist<K, V>::linkedlist() : m_size(0), m_front(nullptr) {}
 
 /// @brief Copy constructor.
 /// Creates a copy of List instance.
@@ -140,9 +139,9 @@ linkedlist<K, V>::linkedlist() : m_size(0), m_front(nullptr), m_back(nullptr) {}
 /// @tparam V type of value.
 template <typename K, typename V>
 linkedlist<K, V>::linkedlist(const linkedlist& other) :
-    m_size(0), m_front(nullptr), m_back(nullptr) {
+    m_size(0), m_front(nullptr) {
   for (listnode<K, V>* node = other.m_front; node; node = node->m_next)
-    push_back(node->m_key, node->m_value);
+    push_front(node->m_key, node->m_value);
 }
 
 /// @brief Destructor for List.
@@ -163,7 +162,6 @@ template <typename K, typename V>
 linkedlist<K, V>& linkedlist<K, V>::operator=(linkedlist other) {
   std::swap(m_size, other.m_size);
   std::swap(m_front, other.m_front);
-  std::swap(m_back, other.m_back);
   return *this;
 }
 
@@ -182,17 +180,15 @@ linkedlist<K, V>& linkedlist<K, V>::operator=(linkedlist other) {
 /// @retval true key has been added successfully.
 /// @retval false duplicate key found.
 template <typename K, typename V>
-bool linkedlist<K, V>::push_back(const K& key, const V& value) {
+bool linkedlist<K, V>::push_front(const K& key, const V& value) {
   if (m_front == nullptr) {
-    m_back = m_front = new listnode<K, V>(key, value);
+    m_front = new listnode<K, V>(key, value);
   } else {
-    // issue: no need to have a tail because of that.
     for (listnode<K, V>* node = m_front; node; node = node->m_next)
       if (node->m_key == key) {
         return false;  // dublicate keys
       }
-    m_back->m_next = new listnode<K, V>(key, value);
-    m_back = m_back->m_next;
+    m_front = new listnode<K, V>(key, value, m_front);
   }
   m_size++;
   return true;
@@ -211,16 +207,12 @@ template <typename K, typename V>
 bool linkedlist<K, V>::erase(const K& key) {
   listnode<K, V>* node;
   listnode<K, V>* prev = nullptr;
-  for ( node = m_front; node; node = node->m_next ) {
-    if ( node->m_key == key ) {
-      if ( node == m_front ) {
+  for (node = m_front; node; node = node->m_next) {
+    if (node->m_key == key) {
+      if (node == m_front) {
         m_front = node->m_next;
-        if (node == m_back)
-          m_back = nullptr;
      } else {
         prev->m_next = node->m_next;
-        if (node == m_back)
-          m_back = prev;
       }
       delete node;
       m_size--;
@@ -303,7 +295,6 @@ void linkedlist<K, V>::clear() {
         node_to_delete = m_front;
     }
     m_size = 0;
-    m_back = m_front = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
